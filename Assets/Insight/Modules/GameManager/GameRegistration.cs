@@ -41,6 +41,8 @@ namespace Insight
             {
                 Debug.Log("[Args] - NetworkAddress: " + args.NetworkAddress);
                 NetworkAddress = args.NetworkAddress;
+
+                NetworkManager.singleton.networkAddress = NetworkAddress;
             }
 
             if (args.IsProvided("-NetworkPort"))
