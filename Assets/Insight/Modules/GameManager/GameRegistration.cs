@@ -48,14 +48,17 @@ namespace Insight
                 Debug.Log("[Args] - NetworkPort: " + args.NetworkPort);
                 NetworkPort = (ushort)args.NetworkPort;
 
-                if(networkManagerTransport.GetType().GetField("port") != null) {
-                    networkManagerTransport.GetType().GetField("port").SetValue(networkManagerTransport, (ushort)args.NetworkPort);
-                }
-
-                //For IgnoranceTransport
-                if (networkManagerTransport.GetType().GetField("CommunicationPort") != null)
-                {
-                    networkManagerTransport.GetType().GetField("CommunicationPort").SetValue(networkManagerTransport, (ushort)args.NetworkPort);
+                if(networkManagerTransport is MultiplexTransport) {
+                    ushort startPort = (ushort)NetworkPort;
+                    foreach(Transport transport in (networkManagerTransport as MultiplexTransport).transports) {
+                        SetPort(transport, startPort++);
+                    }
+                } else if(networkManagerTransport is FallbackTransport) {
+                    foreach(Transport transport in (networkManagerTransport as FallbackTransport).transports) {
+                        SetPort(transport, (ushort)NetworkPort);
+                    }
+                } else {
+                    SetPort(networkManagerTransport, (ushort)NetworkPort);
                 }
             }
 
@@ -76,6 +79,14 @@ namespace Insight
 
             //Start NetworkManager
             NetworkManager.singleton.StartServer();
+        }
+
+        void SetPort(Transport transport, ushort port) {
+            if(transport.GetType().GetField("port") != null) {
+                transport.GetType().GetField("port").SetValue(transport, port);
+            }else if (transport.GetType().GetField("CommunicationPort") != null) {//For IgnoranceTransport
+                transport.GetType().GetField("CommunicationPort").SetValue(transport, port);
+            }
         }
 
         void SendGameRegistrationToGameManager()

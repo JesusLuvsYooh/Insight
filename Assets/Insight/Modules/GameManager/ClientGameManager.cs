@@ -33,19 +33,30 @@ namespace Insight
 
             Debug.Log("[InsightClient] - Connecting to GameServer: " + message.NetworkAddress + ":" + message.NetworkPort + "/" + message.SceneName);
 
-            if(networkManagerTransport.GetType().GetField("port") != null) {
-                networkManagerTransport.GetType().GetField("port").SetValue(networkManagerTransport, message.NetworkPort);
-            }
-
-            //For IgnoranceTransport
-            if (networkManagerTransport.GetType().GetField("CommunicationPort") != null)
-            {
-                networkManagerTransport.GetType().GetField("CommunicationPort").SetValue(networkManagerTransport, message.NetworkPort);
+            if(networkManagerTransport is MultiplexTransport) {
+                ushort startPort = message.NetworkPort;
+                foreach(Transport transport in (networkManagerTransport as MultiplexTransport).transports) {
+                    SetPort(transport, startPort++);
+                }
+            } else if(networkManagerTransport is FallbackTransport) {
+                foreach(Transport transport in (networkManagerTransport as FallbackTransport).transports) {
+                    SetPort(transport, message.NetworkPort);
+                }
+            } else {
+                SetPort(networkManagerTransport, message.NetworkPort);
             }
 
             NetworkManager.singleton.networkAddress = message.NetworkAddress;
             SceneManager.LoadScene(message.SceneName);
             NetworkManager.singleton.StartClient();
+        }
+
+        void SetPort(Transport transport, ushort port) {
+            if(transport.GetType().GetField("port") != null) {
+                transport.GetType().GetField("port").SetValue(transport, port);
+            }else if (transport.GetType().GetField("CommunicationPort") != null) {//For IgnoranceTransport
+                transport.GetType().GetField("CommunicationPort").SetValue(transport, port);
+            }
         }
 
         void HandleGameListMsg(InsightNetworkMessage netMsg)

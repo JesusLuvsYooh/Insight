@@ -17,6 +17,8 @@ namespace Insight
         public string SpawnerNetworkAddress = "localhost";
         [Tooltip("Port that will be used by the NetworkManager in the spawned game")]
         public int StartingNetworkPort = 7777; //Default port of the NetworkManager.
+        [Tooltip("Number of ports to allocate for MultiplexTransport")]
+        public int allocatedPorts = 1; //How many transports do you use in MultiplexTransport.
 
         [Header("Paths")]
         public string EditorPath;
@@ -190,7 +192,7 @@ namespace Insight
             //Args to pass: Port, Scene, UniqueID...
             p.StartInfo.Arguments = ArgsString() +
                 " -NetworkAddress " + SpawnerNetworkAddress +
-                " -NetworkPort " + (StartingNetworkPort + thisPort) + 
+                " -NetworkPort " + (StartingNetworkPort + thisPort * allocatedPorts) + 
                 " -SceneName " + spawnProperties.SceneName +
                 " -UniqueID " + spawnProperties.UniqueID; //What to do if the UniqueID or any other value is null??
 
