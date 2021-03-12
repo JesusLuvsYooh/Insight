@@ -11,10 +11,10 @@ namespace Insight
     {
 
 
-        public InsightServer server;
+        internal InsightServer server;
         ModuleManager manager;
         ServerAuthentication authModule;
-        public ServerGameManager gameManager;
+        internal ServerGameManager gameManager;
         MasterSpawner masterSpawner;
 
         public int MinimumPlayersForGame = 1;

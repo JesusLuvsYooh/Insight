@@ -76,6 +76,11 @@ namespace Insight
                 }
             }
 
+            if(freeSlotSpawners.Count == 0) {
+                Debug.LogError("[MasterSpawner] - No Spawners with slots free available to service SpawnRequest.");
+                return;
+            }
+
             //sort by least busy spawner first
             freeSlotSpawners = freeSlotSpawners.OrderBy(x => x.CurrentThreads).ToList();
             server.SendToClient(freeSlotSpawners[0].connectionId, message, (reader) =>
@@ -91,12 +96,10 @@ namespace Insight
                     {
                         netMsg.Reply(callbackResponse);
                     }
-                }
-                if (callbackResponse.Status == CallbackStatus.Timeout)
+                }else if (callbackResponse.Status == CallbackStatus.Timeout)
                 {
                     Debug.Log("[Spawn Callback] Createion Timed Out: " + callbackResponse.UniqueID);
-                }
-                if (callbackResponse.Status == CallbackStatus.Error)
+                }else if (callbackResponse.Status == CallbackStatus.Error)
                 {
                     Debug.Log("[Spawn Callback] Error in SpawnRequest.");
                 }

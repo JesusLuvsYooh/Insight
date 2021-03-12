@@ -12,8 +12,8 @@ namespace Insight
         public string uniqueID;
 
         //This is put in the GUI. Just for example purposes
-        [HideInInspector] public string loginResponse;
-        [HideInInspector] public bool loginSucessful;
+        internal string loginResponse;
+        internal bool loginSucessful;
 
         public override void Initialize(InsightClient client, ModuleManager manager)
         {
@@ -39,12 +39,10 @@ namespace Insight
                     loginSucessful = true;
                     loginResponse = "Login Successful!";
                     Debug.Log("[ClientAuthentication] - Login Successful!");
-                }
-                if (msg.Status == CallbackStatus.Error)
+                }else if (msg.Status == CallbackStatus.Error)
                 {
                     Debug.LogError("[ClientAuthentication] - Callback Error: Login error");
-                }
-                if (msg.Status == CallbackStatus.Timeout)
+                }else if (msg.Status == CallbackStatus.Timeout)
                 {
                     Debug.LogError("[ClientAuthentication] - Callback Error: Login attempt timed out");
                 }
