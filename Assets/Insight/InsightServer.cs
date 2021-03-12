@@ -33,7 +33,13 @@ namespace Insight
 
         public virtual void Update()
         {
+            transport.ServerEarlyUpdate();
+
             CheckCallbackTimeouts();
+        }
+
+        public virtual void LateUpdate() {
+            transport.ServerLateUpdate();
         }
 
         public override void StartInsight()

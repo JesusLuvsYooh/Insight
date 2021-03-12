@@ -42,9 +42,16 @@ namespace Insight
 
         public virtual void Update()
         {
+            transport.ClientEarlyUpdate();
+
+
             CheckConnection();
 
             CheckCallbackTimeouts();
+        }
+
+        public virtual void LateUpdate() {
+            transport.ClientLateUpdate();
         }
 
         public void StartInsight(string Address)
