@@ -24,11 +24,6 @@ namespace Insight
 
             Application.runInBackground = true;
 
-            if (AutoStart)
-            {
-                StartInsight();
-            }
-
             clientID = 0;
             insightNetworkConnection = new InsightNetworkConnection();
             insightNetworkConnection.Initialize(this, networkAddress, clientID, connectionID);
@@ -38,6 +33,10 @@ namespace Insight
             transport.OnClientDataReceived=HandleBytes;
             transport.OnClientDisconnected=OnDisconnected;
             transport.OnClientError=OnError;
+
+            if(AutoStart) {
+                StartInsight();
+            }
         }
 
         public virtual void Update()
@@ -95,7 +94,7 @@ namespace Insight
         {
             if (AutoReconnect)
             {
-                if (!isConnected && (_reconnectTimer < Time.time))
+                if (!isConnected && (_reconnectTimer > 0 && _reconnectTimer < Time.time))
                 {
                     Debug.Log("[InsightClient] - Trying to reconnect...");
                     _reconnectTimer = Time.realtimeSinceStartup + ReconnectDelayInSeconds;
