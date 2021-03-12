@@ -23,7 +23,7 @@ namespace Insight
             masterSpawner = manager.GetModule<MasterSpawner>();
             RegisterHandlers();
 
-            server.transport.OnServerDisconnected=HandleDisconnect;
+            server.transport.OnServerDisconnected += HandleDisconnect;
         }
 
         void RegisterHandlers()
