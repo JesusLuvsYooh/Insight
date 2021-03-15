@@ -6,6 +6,8 @@ namespace Insight
 {
     public class InsightClient : InsightCommon
     {
+        static InsightClient instance;
+
         public bool AutoReconnect = true;
         protected int clientID = -1; //-1 = never connected, 0 = disconnected, 1 = connected
         protected int connectionID = 0;
@@ -19,6 +21,11 @@ namespace Insight
         {
             if(DontDestroy)
             {
+                if(instance != null && instance != this) {
+                    Destroy(gameObject);
+                    return;
+                }
+                instance = this;
                 DontDestroyOnLoad(this);
             }
 
@@ -42,7 +49,6 @@ namespace Insight
         public virtual void Update()
         {
             transport.ClientEarlyUpdate();
-
 
             CheckConnection();
 
