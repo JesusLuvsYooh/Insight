@@ -169,6 +169,11 @@ namespace Insight.Examples
             chatInputField.text = "";
         }
 
+        public void HandleExitButton() {
+            NetworkManager.singleton.StopClient();
+            playerGuiState = PlayerClientGUIState.Main;
+        }
+
         private void CheckGamesList()
         {
             gamesList.Clear();
