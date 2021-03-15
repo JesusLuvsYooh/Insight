@@ -47,14 +47,17 @@ namespace Insight
             }
 
             NetworkManager.singleton.networkAddress = message.NetworkAddress;
-            SceneManager.LoadScene(message.SceneName);
+
             NetworkManager.singleton.StartClient();
+            SceneManager.LoadScene(message.SceneName);
         }
 
         void SetPort(Transport transport, ushort port) {
             if(transport.GetType().GetField("port") != null) {
                 transport.GetType().GetField("port").SetValue(transport, port);
-            }else if (transport.GetType().GetField("CommunicationPort") != null) {//For IgnoranceTransport
+            }else if(transport.GetType().GetField("Port") != null) {
+                transport.GetType().GetField("Port").SetValue(transport, port);
+            }else if(transport.GetType().GetField("CommunicationPort") != null) {//For Ignorance
                 transport.GetType().GetField("CommunicationPort").SetValue(transport, port);
             }
         }
