@@ -51,16 +51,16 @@ namespace Insight
                 NetworkPort = (ushort)args.NetworkPort;
 
                 if(networkManagerTransport is MultiplexTransport) {
-                    ushort startPort = (ushort)NetworkPort;
+                    ushort startPort = NetworkPort;
                     foreach(Transport transport in (networkManagerTransport as MultiplexTransport).transports) {
                         SetPort(transport, startPort++);
                     }
                 } else if(networkManagerTransport is FallbackTransport) {
                     foreach(Transport transport in (networkManagerTransport as FallbackTransport).transports) {
-                        SetPort(transport, (ushort)NetworkPort);
+                        SetPort(transport, NetworkPort);
                     }
                 } else {
-                    SetPort(networkManagerTransport, (ushort)NetworkPort);
+                    SetPort(networkManagerTransport, NetworkPort);
                 }
             }
 
