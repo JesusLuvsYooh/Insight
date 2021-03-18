@@ -64,6 +64,7 @@ namespace Insight
                 if (game.UniqueId == message.UniqueID)
                 {
                     game.CurrentPlayers = message.CurrentPlayers;
+					return;
                 }
             };
         }
