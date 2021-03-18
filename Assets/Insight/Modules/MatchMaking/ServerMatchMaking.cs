@@ -12,7 +12,6 @@ namespace Insight
 
 
         internal InsightServer server;
-        ModuleManager manager;
         ServerAuthentication authModule;
         internal ServerGameManager gameManager;
         MasterSpawner masterSpawner;
@@ -35,10 +34,9 @@ namespace Insight
         public override void Initialize(InsightServer insight, ModuleManager manager)
         {
             server = insight;
-            this.manager = manager;
-            authModule = this.manager.GetModule<ServerAuthentication>();
-            gameManager = this.manager.GetModule<ServerGameManager>();
-            masterSpawner = this.manager.GetModule<MasterSpawner>();
+            authModule = manager.GetModule<ServerAuthentication>();
+            gameManager = manager.GetModule<ServerGameManager>();
+            masterSpawner = manager.GetModule<MasterSpawner>();
 
             RegisterHandlers();
 
