@@ -6,7 +6,7 @@ namespace Insight
 {
     public class InsightClient : InsightCommon
     {
-        static InsightClient instance;
+        public static InsightClient instance;
 
         public bool AutoReconnect = true;
         protected int clientID = -1; //-1 = never connected, 0 = disconnected, 1 = connected
@@ -46,16 +46,17 @@ namespace Insight
             }
         }
 
-        public virtual void Update()
+        public void NetworkEarlyUpdate()
         {
             transport.ClientEarlyUpdate();
-
-            CheckConnection();
-
-            CheckCallbackTimeouts();
         }
 
-        public virtual void LateUpdate() {
+        public void NetworkLateUpdate()
+        {
+			CheckConnection();
+
+			CheckCallbackTimeouts();
+			
             transport.ClientLateUpdate();
         }
 

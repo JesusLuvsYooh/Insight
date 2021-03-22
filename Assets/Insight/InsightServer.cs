@@ -7,6 +7,8 @@ namespace Insight
 {
     public class InsightServer : InsightCommon
     {
+        public static InsightServer instance;
+		
         protected int serverHostId = -1; //-1 = never connected, 0 = disconnected, 1 = connected
         protected Dictionary<int, InsightNetworkConnection> connections = new Dictionary<int, InsightNetworkConnection>();
         protected List<SendToAllFinishedCallbackData> sendToAllFinishedCallbacks = new List<SendToAllFinishedCallbackData>();
@@ -15,6 +17,11 @@ namespace Insight
         {
             if(DontDestroy)
             {
+				if(instance != null && instance != this) {
+                    Destroy(gameObject);
+                    return;
+                }
+                instance = this;										  		   
                 DontDestroyOnLoad(this);
             }
 
@@ -31,14 +38,15 @@ namespace Insight
             }
         }
 
-        public virtual void Update()
+        public void NetworkEarlyUpdate()
         {
             transport.ServerEarlyUpdate();
-
-            CheckCallbackTimeouts();
         }
 
-        public virtual void LateUpdate() {
+        public void NetworkLateUpdate()
+        {
+			CheckCallbackTimeouts();
+
             transport.ServerLateUpdate();
         }
 
