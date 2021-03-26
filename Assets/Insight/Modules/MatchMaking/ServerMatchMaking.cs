@@ -39,6 +39,8 @@ namespace Insight
             masterSpawner = manager.GetModule<MasterSpawner>();
 
             RegisterHandlers();
+			
+			server.transport.OnServerDisconnected += HandleDisconnect;
 
             InvokeRepeating("InvokedUpdate", MatchMakingPollRate, MatchMakingPollRate);
         }
@@ -70,6 +72,29 @@ namespace Insight
                 {
                     playerQueue.Remove(seraching);
                     return;
+                }
+            }
+        }
+		
+		void HandleDisconnect(int connectionId)
+        {
+            foreach (UserContainer user in playerQueue)
+            {
+                if (user.connectionId == connectionId)
+                {
+                    playerQueue.Remove(user);
+                    break;
+                }
+            }
+			foreach(MatchContainer match in matchList)
+			{
+                foreach(UserContainer user in match.matchUsers)
+				{
+                    if(user.connectionId == connectionId)
+					{
+                        match.matchUsers.Remove(user);
+                        break;
+                    }
                 }
             }
         }
