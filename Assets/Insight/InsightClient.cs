@@ -17,7 +17,7 @@ namespace Insight
         public float ReconnectDelayInSeconds = 5f;
         float _reconnectTimer;
 
-        public virtual void Start()
+        void Awake()
         {
             if(DontDestroy)
             {
@@ -27,8 +27,13 @@ namespace Insight
                 }
                 instance = this;
                 DontDestroyOnLoad(this);
+            } else {
+                instance = this;
             }
+        }
 
+        public virtual void Start()
+        {
             Application.runInBackground = true;
 
             clientID = 0;
@@ -41,22 +46,23 @@ namespace Insight
             transport.OnClientDisconnected=OnDisconnected;
             transport.OnClientError=OnError;
 
-            if(AutoStart) {
+            if(AutoStart)
+            {
                 StartInsight();
             }
         }
 
         public void NetworkEarlyUpdate()
         {
+            CheckConnection();
+
+            CheckCallbackTimeouts();
+
             transport.ClientEarlyUpdate();
         }
 
         public void NetworkLateUpdate()
         {
-			CheckConnection();
-
-			CheckCallbackTimeouts();
-			
             transport.ClientLateUpdate();
         }
 

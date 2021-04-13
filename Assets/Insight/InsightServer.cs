@@ -13,18 +13,23 @@ namespace Insight
         protected Dictionary<int, InsightNetworkConnection> connections = new Dictionary<int, InsightNetworkConnection>();
         protected List<SendToAllFinishedCallbackData> sendToAllFinishedCallbacks = new List<SendToAllFinishedCallbackData>();
 
-        public virtual void Start()
+         void Awake()
         {
             if(DontDestroy)
             {
-				if(instance != null && instance != this) {
+                if(instance != null && instance != this) {
                     Destroy(gameObject);
                     return;
                 }
-                instance = this;										  		   
+                instance = this;
                 DontDestroyOnLoad(this);
+            } else {
+                instance = this;
             }
+        }
 
+        public virtual void Start()
+        {
             Application.runInBackground = true;
 
             transport.OnServerConnected=HandleConnect;
@@ -40,13 +45,13 @@ namespace Insight
 
         public void NetworkEarlyUpdate()
         {
+            CheckCallbackTimeouts();
+
             transport.ServerEarlyUpdate();
         }
 
         public void NetworkLateUpdate()
         {
-			CheckCallbackTimeouts();
-
             transport.ServerLateUpdate();
         }
 
