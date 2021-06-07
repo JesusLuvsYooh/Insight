@@ -8,7 +8,7 @@ namespace Insight.Examples
         public static BuildOptions BuildOptions = BuildOptions.Development;
         public static string PrevPath = null;
 
-        [MenuItem("Tools/Build Insight/Build All", false, 0)]
+        [MenuItem("Build Insight/Build All", false, 0)]
         public static void BuildAllMenu()
         {
             string path = GetPath();
@@ -21,7 +21,7 @@ namespace Insight.Examples
             }
         }
 
-        [MenuItem("Tools/Build Insight/MasterServer", false, 100)]
+        [MenuItem("Build Insight/MasterServer", false, 100)]
         public static void BuildMasterServerMenu()
         {
             string path = GetPath();
@@ -31,7 +31,7 @@ namespace Insight.Examples
             }
         }
 
-        [MenuItem("Tools/Build Insight/RemoteSpawner", false, 101)]
+        [MenuItem("Build Insight/RemoteSpawner", false, 101)]
         public static void BuildRemoteSpawnerMenu()
         {
             string path = GetPath();
@@ -41,7 +41,7 @@ namespace Insight.Examples
             }
         }
 
-        [MenuItem("Tools/Build Insight/GameServer", false, 102)]
+        [MenuItem("Build Insight/GameServer", false, 102)]
         public static void BuildGameServerMenu()
         {
             string path = GetPath();
@@ -51,7 +51,7 @@ namespace Insight.Examples
             }
         }
 
-        [MenuItem("Tools/Build Insight/PlayerClient", false, 103)]
+        [MenuItem("Build Insight/PlayerClient", false, 103)]
         public static void BuildPlayerClientMenu()
         {
             string path = GetPath();
