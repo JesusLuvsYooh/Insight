@@ -7,8 +7,6 @@ namespace Insight
 {
     public class ServerGameManager : InsightModule
     {
-        static readonly ILogger logger = LogFactory.GetLogger(typeof(ServerGameManager));
-
         InsightServer server;
         MasterSpawner masterSpawner;
 
@@ -25,7 +23,7 @@ namespace Insight
             masterSpawner = manager.GetModule<MasterSpawner>();
             RegisterHandlers();
 
-            server.transport.OnServerDisconnected=HandleDisconnect;
+            server.transport.OnServerDisconnected += HandleDisconnect;
         }
 
         void RegisterHandlers()
@@ -40,7 +38,7 @@ namespace Insight
         {
             RegisterGameMsg message = netMsg.ReadMessage<RegisterGameMsg>();
 
-            logger.Log("[GameManager] - Received GameRegistration request");
+            Debug.Log("[GameManager] - Received GameRegistration request");
 
             registeredGameServers.Add(new GameContainer()
             {
@@ -59,13 +57,14 @@ namespace Insight
         {
             GameStatusMsg message = netMsg.ReadMessage<GameStatusMsg>();
 
-            logger.Log("[GameManager] - Received Game status update");
+            Debug.Log("[GameManager] - Received Game status update");
 
             foreach (GameContainer game in registeredGameServers)
             {
                 if (game.UniqueId == message.UniqueID)
                 {
                     game.CurrentPlayers = message.CurrentPlayers;
+                    return;
                 }
             };
         }
@@ -85,7 +84,7 @@ namespace Insight
 
         void HandleGameListMsg(InsightNetworkMessage netMsg)
         {
-            logger.Log("[MatchMaking] - Player Requesting Match list");
+            Debug.Log("[MatchMaking] - Player Requesting Match list");
 
             GameListMsg gamesListMsg = new GameListMsg();
             gamesListMsg.Load(registeredGameServers);
@@ -97,7 +96,7 @@ namespace Insight
         {
             JoinGameMsg message = netMsg.ReadMessage<JoinGameMsg>();
 
-            logger.Log("[MatchMaking] - Player joining Match.");
+            Debug.Log("[MatchMaking] - Player joining Match.");
 
             GameContainer game = GetGameByUniqueID(message.UniqueID);
 

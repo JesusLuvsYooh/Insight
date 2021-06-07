@@ -9,12 +9,11 @@ namespace Insight
 {
     public class ServerMatchMaking : InsightModule
     {
-        static readonly ILogger logger = LogFactory.GetLogger(typeof(ServerMatchMaking));
 
-        public InsightServer server;
-        ModuleManager manager;
+
+        internal InsightServer server;
         ServerAuthentication authModule;
-        public ServerGameManager gameManager;
+        internal ServerGameManager gameManager;
         MasterSpawner masterSpawner;
 
         public int MinimumPlayersForGame = 1;
@@ -35,12 +34,13 @@ namespace Insight
         public override void Initialize(InsightServer insight, ModuleManager manager)
         {
             server = insight;
-            this.manager = manager;
-            authModule = this.manager.GetModule<ServerAuthentication>();
-            gameManager = this.manager.GetModule<ServerGameManager>();
-            masterSpawner = this.manager.GetModule<MasterSpawner>();
+            authModule = manager.GetModule<ServerAuthentication>();
+            gameManager = manager.GetModule<ServerGameManager>();
+            masterSpawner = manager.GetModule<MasterSpawner>();
 
             RegisterHandlers();
+			
+			server.transport.OnServerDisconnected += HandleDisconnect;
 
             InvokeRepeating("InvokedUpdate", MatchMakingPollRate, MatchMakingPollRate);
         }
@@ -59,7 +59,7 @@ namespace Insight
 
         void HandleStartMatchSearchMsg(InsightNetworkMessage netMsg)
         {
-            logger.Log("[MatchMaking] - Player joining MatchMaking.");
+            Debug.Log("[MatchMaking] - Player joining MatchMaking.");
 
             playerQueue.Add(authModule.GetUserByConnection(netMsg.connectionId));
         }
@@ -75,18 +75,41 @@ namespace Insight
                 }
             }
         }
+		
+		void HandleDisconnect(int connectionId)
+        {
+            foreach (UserContainer user in playerQueue)
+            {
+                if (user.connectionId == connectionId)
+                {
+                    playerQueue.Remove(user);
+                    break;
+                }
+            }
+			foreach(MatchContainer match in matchList)
+			{
+                foreach(UserContainer user in match.matchUsers)
+				{
+                    if(user.connectionId == connectionId)
+					{
+                        match.matchUsers.Remove(user);
+                        break;
+                    }
+                }
+            }
+        }
 
         void UpdateQueue()
         {
             if (playerQueue.Count < MinimumPlayersForGame)
             {
-                logger.Log("[MatchMaking] - Minimum players in queue not reached.");
+                Debug.Log("[MatchMaking] - Minimum players in queue not reached.");
                 return;
             }
 
             if (masterSpawner.registeredSpawners.Count == 0)
             {
-                logger.Log("[MatchMaking] - No spawners for players in queue.");
+                Debug.Log("[MatchMaking] - No spawners for players in queue.");
                 return;
             }
 
@@ -159,8 +182,6 @@ namespace Insight
     [Serializable]
     public class MatchContainer
     {
-        static readonly ILogger logger = LogFactory.GetLogger(typeof(MatchContainer));
-
         public ServerMatchMaking matchModule;
         public GameContainer MatchServer;
         public List<UserContainer> matchUsers;
@@ -210,7 +231,7 @@ namespace Insight
                     CancelMatch();
                 }
 
-                logger.Log("Server not active at this time");
+                Debug.Log("Server not active at this time");
                 return false;
             }
             return true;
@@ -231,7 +252,7 @@ namespace Insight
 
         void CancelMatch()
         {
-            logger.LogError("Server failed to start within timoue period. Cancelling match.");
+            Debug.LogError("Server failed to start within timoue period. Cancelling match.");
 
             //TODO: Destroy the match process somewhere: MatchServer
 

@@ -7,19 +7,29 @@ namespace Insight
 {
     public class InsightServer : InsightCommon
     {
-        static readonly ILogger logger = LogFactory.GetLogger(typeof(InsightServer));
-
+        public static InsightServer instance;
+		
         protected int serverHostId = -1; //-1 = never connected, 0 = disconnected, 1 = connected
         protected Dictionary<int, InsightNetworkConnection> connections = new Dictionary<int, InsightNetworkConnection>();
         protected List<SendToAllFinishedCallbackData> sendToAllFinishedCallbacks = new List<SendToAllFinishedCallbackData>();
 
-        public virtual void Start()
+         void Awake()
         {
             if(DontDestroy)
             {
+                if(instance != null && instance != this) {
+                    Destroy(gameObject);
+                    return;
+                }
+                instance = this;
                 DontDestroyOnLoad(this);
+            } else {
+                instance = this;
             }
+        }
 
+        public virtual void Start()
+        {
             Application.runInBackground = true;
 
             transport.OnServerConnected=HandleConnect;
@@ -33,14 +43,21 @@ namespace Insight
             }
         }
 
-        public virtual void Update()
+        public void NetworkEarlyUpdate()
         {
             CheckCallbackTimeouts();
+
+            transport.ServerEarlyUpdate();
+        }
+
+        public void NetworkLateUpdate()
+        {
+            transport.ServerLateUpdate();
         }
 
         public override void StartInsight()
         {
-            logger.Log("[InsightServer] - Start");
+            Debug.Log("[InsightServer] - Start");
             transport.ServerStart();
             serverHostId = 0;
 
@@ -64,7 +81,7 @@ namespace Insight
 
         void HandleConnect(int connectionId)
         {
-            logger.Log("[InsightServer] - Client connected connectionID: " + connectionId, this);
+            Debug.Log("[InsightServer] - Client connected connectionID: " + connectionId, this);
 
             // get ip address from connection
             string address = GetConnectionInfo(connectionId);
@@ -77,7 +94,7 @@ namespace Insight
 
         void HandleDisconnect(int connectionId)
         {
-            logger.Log("[InsightServer] - Client disconnected connectionID: " + connectionId, this);
+            Debug.Log("[InsightServer] - Client disconnected connectionID: " + connectionId, this);
 
             InsightNetworkConnection conn;
             if (connections.TryGetValue(connectionId, out conn))
@@ -90,12 +107,17 @@ namespace Insight
         void HandleData(int connectionId, ArraySegment<byte> data, int i)
         {
             NetworkReader reader = new NetworkReader(data);
+#if MIRROR_39_0_OR_NEWER
+            short msgType = reader.ReadShort();
+            int callbackId = reader.ReadInt();
+#else
             short msgType = reader.ReadInt16();
             int callbackId = reader.ReadInt32();
+#endif
             InsightNetworkConnection insightNetworkConnection;
             if (!connections.TryGetValue(connectionId, out insightNetworkConnection))
             {
-                logger.LogError("HandleData: Unknown connectionId: " + connectionId, this);
+                Debug.LogError("HandleData: Unknown connectionId: " + connectionId, this);
                 return;
             }
 
@@ -116,7 +138,7 @@ namespace Insight
         void OnError(int connectionId, Exception exception)
         {
             // TODO Let's discuss how we will handle errors
-            logger.LogException(exception);
+            Debug.LogException(exception);
         }
 
         public string GetConnectionInfo(int connectionId)
@@ -158,22 +180,27 @@ namespace Insight
             {
                 NetworkWriter writer = new NetworkWriter();
                 int msgType = GetId(default(Message) != null ? typeof(Message) : msg.GetType());
+#if MIRROR_39_0_OR_NEWER
+                writer.WriteUShort((ushort)msgType);
+#else
                 writer.WriteUInt16((ushort)msgType);
-
+#endif
                 int callbackId = 0;
                 if (callback != null)
                 {
                     callbackId = ++callbackIdIndex; // pre-increment to ensure that id 0 is never used.
                     callbacks.Add(callbackId, new CallbackData() { callback = callback, timeout = Time.realtimeSinceStartup + callbackTimeout });
                 }
-
+#if MIRROR_39_0_OR_NEWER
+                writer.WriteInt(callbackId);
+#else
                 writer.WriteInt32(callbackId);
-
+#endif
                 Writer<T>.write.Invoke(writer, msg);
 
                 return connections[connectionId].Send(writer.ToArray());
             }
-            logger.LogError("Server.Send: not connected!", this);
+            Debug.LogError("Server.Send: not connected!", this);
             return false;
         }
 
@@ -186,10 +213,14 @@ namespace Insight
         {
             if (transport.ServerActive())
             {
+#if MIRROR_39_0_OR_NEWER
+                transport.ServerSend(connectionId, new ArraySegment<byte>(data), 0);
+#else
                 transport.ServerSend(connectionId, 0, new ArraySegment<byte>(data));
+#endif
                 return true;
             }
-            logger.LogError("Server.Send: not connected!", this);
+            Debug.LogError("Server.Send: not connected!", this);
             return false;
         }
 
@@ -215,7 +246,7 @@ namespace Insight
                 }
                 return true;
             }
-            logger.LogError("Server.Send: not connected!", this);
+            Debug.LogError("Server.Send: not connected!", this);
             return false;
         }
 
@@ -239,13 +270,13 @@ namespace Insight
                 }
                 return true;
             }
-            logger.LogError("Server.Send: not connected!", this);
+            Debug.LogError("Server.Send: not connected!", this);
             return false;
         }
 
         void OnApplicationQuit()
         {
-            logger.Log("[InsightServer] Stopping Server");
+            Debug.Log("[InsightServer] Stopping Server");
             transport.ServerStop();
         }
 
@@ -280,12 +311,12 @@ namespace Insight
         ////----------virtual handlers--------------//
         public virtual void OnStartInsight()
         {
-            logger.Log("[InsightServer] - Server started listening");
+            Debug.Log("[InsightServer] - Server started listening");
         }
 
         public virtual void OnStopInsight()
         {
-            logger.Log("[InsightServer] - Server stopping");
+            Debug.Log("[InsightServer] - Server stopping");
         }
     }
 }

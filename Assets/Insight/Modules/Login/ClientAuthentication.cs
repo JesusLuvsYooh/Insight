@@ -7,15 +7,13 @@ namespace Insight
 {
     public class ClientAuthentication : InsightModule
     {
-        static readonly ILogger logger = LogFactory.GetLogger(typeof(ClientAuthentication));
-
         InsightClient client;
 
         public string uniqueID;
 
         //This is put in the GUI. Just for example purposes
-        [HideInInspector] public string loginResponse;
-        [HideInInspector] public bool loginSucessful;
+        internal string loginResponse;
+        internal bool loginSucessful;
 
         public override void Initialize(InsightClient client, ModuleManager manager)
         {
@@ -40,15 +38,13 @@ namespace Insight
                     uniqueID = msg.UniqueID;
                     loginSucessful = true;
                     loginResponse = "Login Successful!";
-                    logger.Log("[ClientAuthentication] - Login Successful!");
-                }
-                if (msg.Status == CallbackStatus.Error)
+                    Debug.Log("[ClientAuthentication] - Login Successful!");
+                }else if (msg.Status == CallbackStatus.Error)
                 {
-                    logger.LogError("[ClientAuthentication] - Callback Error: Login error");
-                }
-                if (msg.Status == CallbackStatus.Timeout)
+                    Debug.LogError("[ClientAuthentication] - Callback Error: Login error");
+                }else if (msg.Status == CallbackStatus.Timeout)
                 {
-                    logger.LogError("[ClientAuthentication] - Callback Error: Login attempt timed out");
+                    Debug.LogError("[ClientAuthentication] - Callback Error: Login attempt timed out");
                 }
             });
         }

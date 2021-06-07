@@ -14,7 +14,7 @@ namespace Insight.Examples
         public GameObject RootMainPanel;
         public GameObject RootGamePanel;
 
-        [HideInInspector] public PlayerClientGUIState playerGuiState;
+        PlayerClientGUIState playerGuiState;
 
         [Header("Insight Modules")]
         public ClientAuthentication authComp;
@@ -72,6 +72,10 @@ namespace Insight.Examples
             if (NetworkManager.singleton.isNetworkActive)
             {
                 playerGuiState = PlayerClientGUIState.Game;
+            }
+            else if (authComp.loginSucessful)
+            {
+                playerGuiState = PlayerClientGUIState.Main;
             }
         }
 
@@ -139,6 +143,8 @@ namespace Insight.Examples
 
         public void HandleJoinGameButton(string UniqueID)
         {
+            HandleCancelButton();
+
             gameComp.SendJoinGameMsg(UniqueID);
 
             playerGuiState = PlayerClientGUIState.Game;
@@ -167,6 +173,11 @@ namespace Insight.Examples
         {
             chatComp.SendChatMsg(chatInputField.text);
             chatInputField.text = "";
+        }
+
+        public void HandleExitButton()
+        {
+            NetworkManager.singleton.StopClient();
         }
 
         private void CheckGamesList()

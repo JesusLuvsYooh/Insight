@@ -7,8 +7,6 @@ namespace Insight
 {
     public class InsightNetworkConnection : IDisposable
     {
-        static readonly ILogger logger = LogFactory.GetLogger(typeof(InsightNetworkConnection));
-
         Dictionary<int, InsightNetworkMessageDelegate> m_MessageHandlers;
 
         public int hostId = -1;
@@ -84,7 +82,7 @@ namespace Insight
                 msgDelegate(message);
                 return true;
             }
-            logger.LogError("NetworkConnection InvokeHandler no handler for " + msgType);
+            Debug.LogError("NetworkConnection InvokeHandler no handler for " + msgType);
             return false;
         }
 
@@ -103,7 +101,7 @@ namespace Insight
         {
             if (m_MessageHandlers.ContainsKey(msgType))
             {
-                logger.Log("NetworkConnection.RegisterHandler replacing " + msgType);
+                Debug.Log("NetworkConnection.RegisterHandler replacing " + msgType);
             }
             m_MessageHandlers[msgType] = handler;
         }
@@ -125,14 +123,14 @@ namespace Insight
             //Currently no support for transport channels in Insight.
             if (bytes.Length > GetActiveInsight().transport.GetMaxPacketSize(0))
             {
-                logger.LogError("NetworkConnection:SendBytes cannot send packet larger than " + int.MaxValue + " bytes");
+                Debug.LogError("NetworkConnection:SendBytes cannot send packet larger than " + int.MaxValue + " bytes");
                 return false;
             }
 
             if (bytes.Length == 0)
             {
                 // zero length packets getting into the packet queues are bad.
-                logger.LogError("NetworkConnection:SendBytes cannot send zero bytes");
+                Debug.LogError("NetworkConnection:SendBytes cannot send zero bytes");
                 return false;
             }
 
@@ -146,10 +144,12 @@ namespace Insight
 
             if (GetActiveInsight().UnpackMessage(reader, out int msgType))
             {
-                logger.Log("ConnectionRecv " + this + " msgType:" + msgType + " content:" + BitConverter.ToString(data.Array, data.Offset, data.Count));
-
+                Debug.Log("ConnectionRecv " + this + " msgType:" + msgType + " content:" + BitConverter.ToString(data.Array, data.Offset, data.Count));
+#if MIRROR_39_0_OR_NEWER
+                int callbackId = reader.ReadInt();
+#else
                 int callbackId = reader.ReadInt32();
-
+#endif
                 // try to invoke the handler for that message
                 InsightNetworkMessageDelegate msgDelegate;
                 if (m_MessageHandlers.TryGetValue(msgType, out msgDelegate))
@@ -167,7 +167,7 @@ namespace Insight
             else
             {
                 //NOTE: this throws away the rest of the buffer. Need moar error codes
-                logger.LogError("Unknown message ID " + msgType + " connId:" + connectionId);
+                Debug.LogError("Unknown message ID " + msgType + " connId:" + connectionId);
             }
         }
 
@@ -236,9 +236,15 @@ namespace Insight
         {
             NetworkWriter writer = new NetworkWriter();
             int msgType = conn.GetActiveInsight().GetId(default(Message) != null ? typeof(Message) : msg.GetType());
+#if MIRROR_39_0_OR_NEWER
+            writer.WriteUShort((ushort)msgType);
+
+            writer.WriteInt(callbackId);
+#else
             writer.WriteUInt16((ushort)msgType);
 
             writer.WriteInt32(callbackId);
+#endif
             Writer<T>.write.Invoke(writer, msg);
 
             conn.Send(writer.ToArray());
