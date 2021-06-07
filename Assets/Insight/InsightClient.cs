@@ -118,7 +118,11 @@ namespace Insight
 
         public void Send(byte[] data)
         {
+#if MIRROR_39_0_OR_NEWER
+            transport.ClientSend(new ArraySegment<byte>(data), 0);
+#else
             transport.ClientSend(0,  new ArraySegment<byte>(data));
+#endif
         }
 
         public void Send<T>(T msg) where T : Message
@@ -136,8 +140,11 @@ namespace Insight
 
             NetworkWriter writer = new NetworkWriter();
             int msgType = GetId(default(T) != null ? typeof(T) : msg.GetType());
+#if MIRROR_39_0_OR_NEWER
+            writer.WriteUShort((ushort)msgType);
+#else
             writer.WriteUInt16((ushort)msgType);
-
+#endif
             int callbackId = 0;
             if (callback != null)
             {
@@ -148,11 +155,17 @@ namespace Insight
                     timeout = Time.realtimeSinceStartup + callbackTimeout
                 });
             }
-
+#if MIRROR_39_0_OR_NEWER
+            writer.WriteInt(callbackId);
+#else
             writer.WriteInt32(callbackId);
-
+#endif
             Writer<T>.write.Invoke(writer, msg);
+#if MIRROR_39_0_OR_NEWER
+            transport.ClientSend(new ArraySegment<byte>(writer.ToArray()), 0);
+#else
             transport.ClientSend(0, new ArraySegment<byte>(writer.ToArray()));
+#endif
         }
 
         void HandleCallbackHandler(CallbackStatus status, NetworkReader reader)
@@ -182,7 +195,11 @@ namespace Insight
             NetworkReader reader = new NetworkReader(data);
             if(UnpackMessage(reader, out int msgType))
             {
+#if MIRROR_39_0_OR_NEWER
+                int callbackId = reader.ReadInt();
+#else
                 int callbackId = reader.ReadInt32();
+#endif
                 InsightNetworkMessage msg = new InsightNetworkMessage(insightNetworkConnection, callbackId)
                 {
                     msgType = msgType,

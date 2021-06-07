@@ -145,9 +145,11 @@ namespace Insight
             if (GetActiveInsight().UnpackMessage(reader, out int msgType))
             {
                 Debug.Log("ConnectionRecv " + this + " msgType:" + msgType + " content:" + BitConverter.ToString(data.Array, data.Offset, data.Count));
-
+#if MIRROR_39_0_OR_NEWER
+                int callbackId = reader.ReadInt();
+#else
                 int callbackId = reader.ReadInt32();
-
+#endif
                 // try to invoke the handler for that message
                 InsightNetworkMessageDelegate msgDelegate;
                 if (m_MessageHandlers.TryGetValue(msgType, out msgDelegate))
@@ -234,9 +236,15 @@ namespace Insight
         {
             NetworkWriter writer = new NetworkWriter();
             int msgType = conn.GetActiveInsight().GetId(default(Message) != null ? typeof(Message) : msg.GetType());
+#if MIRROR_39_0_OR_NEWER
+            writer.WriteUShort((ushort)msgType);
+
+            writer.WriteInt(callbackId);
+#else
             writer.WriteUInt16((ushort)msgType);
 
             writer.WriteInt32(callbackId);
+#endif
             Writer<T>.write.Invoke(writer, msg);
 
             conn.Send(writer.ToArray());
