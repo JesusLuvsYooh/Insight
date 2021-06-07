@@ -38,10 +38,6 @@ namespace Insight
                 foreach(Transport transport in (networkManagerTransport as MultiplexTransport).transports) {
                     SetPort(transport, startPort++);
                 }
-            } else if(networkManagerTransport is FallbackTransport) {
-                foreach(Transport transport in (networkManagerTransport as FallbackTransport).transports) {
-                    SetPort(transport, message.NetworkPort);
-                }
             } else {
                 SetPort(networkManagerTransport, message.NetworkPort);
             }
