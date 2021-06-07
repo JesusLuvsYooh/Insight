@@ -67,14 +67,7 @@ namespace Insight
             RequestSpawnStartMsg message = netMsg.ReadMessage<RequestSpawnStartMsg>();
 
             //Get all spawners that have atleast 1 slot free
-            List<SpawnerContainer> freeSlotSpawners = new List<SpawnerContainer>();
-            foreach (SpawnerContainer spawner in registeredSpawners)
-            {
-                if (spawner.CurrentThreads < spawner.MaxThreads)
-                {
-                    freeSlotSpawners.Add(spawner);
-                }
-            }
+            List<SpawnerContainer> freeSlotSpawners = registeredSpawners.Where(x => (x.CurrentThreads < x.MaxThreads)).ToList();
 
             if(freeSlotSpawners.Count == 0) {
                 Debug.LogError("[MasterSpawner] - No Spawners with slots free available to service SpawnRequest.");
@@ -129,15 +122,8 @@ namespace Insight
             }
 
             //Get all spawners that have atleast 1 slot free
-			List<SpawnerContainer> freeSlotSpawners = new List<SpawnerContainer>();
-            foreach (SpawnerContainer spawner in registeredSpawners)
-            {
-                if (spawner.CurrentThreads < spawner.MaxThreads)
-                {
-                    freeSlotSpawners.Add(spawner);
-                }
-            }
-			
+            List<SpawnerContainer> freeSlotSpawners = registeredSpawners.Where(x => (x.CurrentThreads < x.MaxThreads)).ToList();
+
             if (freeSlotSpawners.Count == 0)
             {
                 Debug.LogError("[MasterSpawner] - No Spawners with slots free available to service SpawnRequest.");
