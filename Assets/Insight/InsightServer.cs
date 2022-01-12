@@ -7,29 +7,17 @@ namespace Insight
 {
     public class InsightServer : InsightCommon
     {
-        public static InsightServer instance;
-		
         protected int serverHostId = -1; //-1 = never connected, 0 = disconnected, 1 = connected
         protected Dictionary<int, InsightNetworkConnection> connections = new Dictionary<int, InsightNetworkConnection>();
         protected List<SendToAllFinishedCallbackData> sendToAllFinishedCallbacks = new List<SendToAllFinishedCallbackData>();
 
-         void Awake()
+        public virtual void Start()
         {
             if(DontDestroy)
             {
-                if(instance != null && instance != this) {
-                    Destroy(gameObject);
-                    return;
-                }
-                instance = this;
                 DontDestroyOnLoad(this);
-            } else {
-                instance = this;
-            }
         }
 
-        public virtual void Start()
-        {
             Application.runInBackground = true;
 
             transport.OnServerConnected=HandleConnect;
@@ -43,15 +31,15 @@ namespace Insight
             }
         }
 
-        public void NetworkEarlyUpdate()
+        public override void NetworkEarlyUpdate()
         {
-            CheckCallbackTimeouts();
-
             transport.ServerEarlyUpdate();
         }
 
-        public void NetworkLateUpdate()
+        public override void NetworkLateUpdate()
         {
+            CheckCallbackTimeouts();
+
             transport.ServerLateUpdate();
         }
 

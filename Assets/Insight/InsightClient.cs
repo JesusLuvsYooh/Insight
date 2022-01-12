@@ -6,8 +6,6 @@ namespace Insight
 {
     public class InsightClient : InsightCommon
     {
-        public static InsightClient instance;
-
         public bool AutoReconnect = true;
         protected int clientID = -1; //-1 = never connected, 0 = disconnected, 1 = connected
         protected int connectionID = 0;
@@ -17,23 +15,13 @@ namespace Insight
         public float ReconnectDelayInSeconds = 5f;
         float _reconnectTimer;
 
-        void Awake()
+        public virtual void Start()
         {
             if(DontDestroy)
             {
-                if(instance != null && instance != this) {
-                    Destroy(gameObject);
-                    return;
-                }
-                instance = this;
                 DontDestroyOnLoad(this);
-            } else {
-                instance = this;
-            }
         }
 
-        public virtual void Start()
-        {
             Application.runInBackground = true;
 
             clientID = 0;
@@ -52,18 +40,21 @@ namespace Insight
             }
         }
 
-        public void NetworkEarlyUpdate()
+        public override void NetworkEarlyUpdate()
         {
-            CheckConnection();
-
-            CheckCallbackTimeouts();
-
             transport.ClientEarlyUpdate();
         }
 
-        public void NetworkLateUpdate()
+        public override void NetworkLateUpdate()
         {
+            CheckCallbackTimeouts();
+
             transport.ClientLateUpdate();
+        }
+
+        public virtual void Update()
+        {
+            CheckConnection();
         }
 
         public void StartInsight(string Address)
