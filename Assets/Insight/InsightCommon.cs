@@ -136,11 +136,7 @@ namespace Insight
             // read message type (varint)
             try
             {
-#if MIRROR_39_0_OR_NEWER
                 msgType = messageReader.ReadUShort();
-#else
-                msgType = messageReader.ReadUInt16();
-#endif
                 return true;
             }
             catch (System.IO.EndOfStreamException)
