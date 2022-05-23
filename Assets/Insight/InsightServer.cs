@@ -7,17 +7,31 @@ namespace Insight
 {
     public class InsightServer : InsightCommon
     {
+		public static InsightServer instance;
+
         protected int serverHostId = -1; //-1 = never connected, 0 = disconnected, 1 = connected
         protected Dictionary<int, InsightNetworkConnection> connections = new Dictionary<int, InsightNetworkConnection>();
         protected List<SendToAllFinishedCallbackData> sendToAllFinishedCallbacks = new List<SendToAllFinishedCallbackData>();
 
+		public override void Awake()
+		{
+            base.Awake();
+            if(DontDestroy){
+                if(instance != null && instance != this)
+				{
+                    Destroy(gameObject);
+                    return;
+                }
+                instance = this;
+                DontDestroyOnLoad(this);
+            } else
+			{
+                instance = this;
+            }
+        }
+		
         public virtual void Start()
         {
-            if(DontDestroy)
-            {
-                DontDestroyOnLoad(this);
-        }
-
             Application.runInBackground = true;
 
             transport.OnServerConnected=HandleConnect;

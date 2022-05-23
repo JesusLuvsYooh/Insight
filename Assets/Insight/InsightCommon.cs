@@ -40,12 +40,14 @@ namespace Insight
 
         public bool isConnected { get { return connectState == ConnectState.Connected; } }
 
-        void Awake(){
+        public virtual void Awake()
+		{
             NetworkLoop.OnEarlyUpdate += NetworkEarlyUpdate;
             NetworkLoop.OnLateUpdate += NetworkLateUpdate;
         }
 
-        void OnDestroy(){
+        void OnDestroy()
+		{
             NetworkLoop.OnEarlyUpdate -= NetworkEarlyUpdate;
             NetworkLoop.OnLateUpdate -= NetworkLateUpdate;
         }

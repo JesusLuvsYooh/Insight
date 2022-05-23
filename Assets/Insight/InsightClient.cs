@@ -6,6 +6,8 @@ namespace Insight
 {
     public class InsightClient : InsightCommon
     {
+		public static InsightClient instance;
+
         public bool AutoReconnect = true;
         protected int clientID = -1; //-1 = never connected, 0 = disconnected, 1 = connected
         protected int connectionID = 0;
@@ -15,13 +17,25 @@ namespace Insight
         public float ReconnectDelayInSeconds = 5f;
         float _reconnectTimer;
 
+		public override void Awake()
+		{
+            base.Awake();
+            if(DontDestroy){
+                if(instance != null && instance != this)
+				{
+                    Destroy(gameObject);
+                    return;
+                }
+                instance = this;
+                DontDestroyOnLoad(this);
+            } else
+			{
+                instance = this;
+            }
+        }
+		
         public virtual void Start()
         {
-            if(DontDestroy)
-            {
-                DontDestroyOnLoad(this);
-        }
-
             Application.runInBackground = true;
 
             clientID = 0;
