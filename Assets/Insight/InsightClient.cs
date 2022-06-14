@@ -16,6 +16,7 @@ namespace Insight
 
         public float ReconnectDelayInSeconds = 5f;
         float _reconnectTimer;
+		bool active;
 
 		public override void Awake()
 		{
@@ -86,6 +87,8 @@ namespace Insight
 
         public override void StartInsight()
         {
+			active = true;
+			
             transport.ClientConnect(networkAddress);
 
             OnStartInsight();
@@ -95,6 +98,8 @@ namespace Insight
 
         public void StartInsight(Uri uri)
         {
+			active = true;
+			
             transport.ClientConnect(uri);
 
             OnStartInsight();
@@ -104,15 +109,22 @@ namespace Insight
 
         public override void StopInsight()
         {
+			active = false;
+			
             transport.ClientDisconnect();
-            OnStopInsight();
+
+            if(connectState != ConnectState.Disconnected){
+                connectState = ConnectState.Disconnected;
+
+                OnStopInsight();
+            }
         }
 
         private void CheckConnection()
         {
             if (AutoReconnect)
             {
-                if (!isConnected && (_reconnectTimer > 0 && _reconnectTimer < Time.time))
+                if (active && !isConnected && (_reconnectTimer > 0 && _reconnectTimer < Time.time))
                 {
                     Debug.Log("[InsightClient] - Trying to reconnect...");
                     _reconnectTimer = Time.realtimeSinceStartup + ReconnectDelayInSeconds;
@@ -173,9 +185,11 @@ namespace Insight
 
         void OnDisconnected()
         {
-            connectState = ConnectState.Disconnected;
+            if(connectState != ConnectState.Disconnected){
+                connectState = ConnectState.Disconnected;
 
-            StopInsight();
+                OnStopInsight();
+            }
         }
 
         protected void HandleBytes(ArraySegment<byte> data, int i)
