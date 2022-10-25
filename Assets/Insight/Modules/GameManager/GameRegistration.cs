@@ -6,6 +6,8 @@ namespace Insight
 {
     public class GameRegistration : InsightModule
     {
+        public bool LogAll = true;
+
         InsightClient client;
         Transport networkManagerTransport;
 
@@ -19,6 +21,11 @@ namespace Insight
         public int MaxPlayers;
         public int CurrentPlayers;
 
+        //Current insight flow, is allowing players to send info through master server to game server. (rare use case)
+        //You either want to disable that, or add vigorous checks, here we will do a verified scenes string name check as an example
+        [Scene] public string[] verifiedScenes;
+        private bool AbortRun = false;
+
         public override void Initialize(InsightClient insight, ModuleManager manager)
         {
             client = insight;
@@ -29,6 +36,11 @@ namespace Insight
             RegisterHandlers();
             GatherCmdArgs();
 
+            if (AbortRun)
+            {
+                Debug.LogError("Registration aborted.");
+                return;
+            }
             InvokeRepeating("SendGameStatusToGameManager", 30f, 30f);
         }
 
@@ -39,7 +51,8 @@ namespace Insight
             InsightArgs args = new InsightArgs();
             if (args.IsProvided("-NetworkAddress"))
             {
-                Debug.Log("[Args] - NetworkAddress: " + args.NetworkAddress);
+                if (LogAll)
+                    Debug.Log("[Args] - NetworkAddress: " + args.NetworkAddress);
                 NetworkAddress = args.NetworkAddress;
 
                 NetworkManager.singleton.networkAddress = NetworkAddress;
@@ -47,51 +60,104 @@ namespace Insight
 
             if (args.IsProvided("-NetworkPort"))
             {
-                Debug.Log("[Args] - NetworkPort: " + args.NetworkPort);
+                if (LogAll)
+                    Debug.Log("[Args] - NetworkPort: " + args.NetworkPort);
                 NetworkPort = (ushort)args.NetworkPort;
 
-                if(networkManagerTransport is MultiplexTransport) {
+                if (networkManagerTransport is MultiplexTransport)
+                {
                     ushort startPort = NetworkPort;
-                    foreach(Transport transport in (networkManagerTransport as MultiplexTransport).transports) {
+                    foreach (Transport transport in (networkManagerTransport as MultiplexTransport).transports)
+                    {
                         SetPort(transport, startPort++);
                     }
-                } else {
+                }
+                else
+                {
                     SetPort(networkManagerTransport, NetworkPort);
                 }
             }
 
             if (args.IsProvided("-SceneName"))
             {
-                Debug.Log("[Args] - SceneName: " + args.SceneName);
-                GameScene = args.SceneName;
-                SceneManager.LoadScene(args.SceneName);
+                if (LogAll)
+                    Debug.Log("[Args] - SceneName: " + args.SceneName);
+
+                // if no scenes registered for client control verification, presume no scene switch
+                if (verifiedScenes.Length > 0)
+                {
+                    foreach (string _sceneName in verifiedScenes)
+                    {
+                        if (_sceneName == args.SceneName)
+                        {
+                            if (LogAll)
+                                Debug.Log("[Args] - Scene found/verified.");
+                            GameScene = args.SceneName;
+                            SceneManager.LoadScene(GameScene);
+                        }
+                        else
+                        {
+                            Debug.LogWarning("[Args] - Scene not found/verified.");
+                            // if no matches, you could go to a verified scene, or stay on current scene
+                            //GameScene = verifiedScenes[0];
+                        }
+                    }
+                    //}
+                    //else
+                    //{
+                    // What to do if no verified scenes added in inspector, carry on or..
+                    //    Debug.LogWarning("[Args] - No scenes in verified array.");
+                    //    AbortRun = true;
+
+                    // or do default behaviour of older insight, accept client sent scene string and try to load
+                    //GameScene = args.SceneName;
+                    //SceneManager.LoadScene(GameScene);
+                    //}
+                }
             }
 
             if (args.IsProvided("-UniqueID"))
             {
-                Debug.Log("[Args] - UniqueID: " + args.UniqueID);
+                if (LogAll)
+                    Debug.Log("[Args] - UniqueID: " + args.UniqueID);
                 UniqueID = args.UniqueID;
             }
 
             MaxPlayers = NetworkManager.singleton.maxConnections;
 
-            //Start NetworkManager
-            NetworkManager.singleton.StartServer();
+            if (AbortRun == true)
+            {
+                Debug.LogError("[Args] - Aborting Setup.");
+                NetworkManager.singleton.StopServer();
+                //Application.Quit();
+            }
+            else
+            {
+                //Start NetworkManager
+                NetworkManager.singleton.StartServer();
+            }
         }
 
-        void SetPort(Transport transport, ushort port) {
-            if(transport.GetType().GetField("port") != null) {
+        void SetPort(Transport transport, ushort port)
+        {
+            if (transport.GetType().GetField("port") != null)
+            {
                 transport.GetType().GetField("port").SetValue(transport, port);
-            }else if(transport.GetType().GetField("Port") != null) {
+            }
+            else if (transport.GetType().GetField("Port") != null)
+            {
                 transport.GetType().GetField("Port").SetValue(transport, port);
-            }else if(transport.GetType().GetField("CommunicationPort") != null) {//For Ignorance
+            }
+            else if (transport.GetType().GetField("CommunicationPort") != null)
+            {//For Ignorance
                 transport.GetType().GetField("CommunicationPort").SetValue(transport, port);
             }
         }
 
         void SendGameRegistrationToGameManager()
         {
-            Debug.Log("[GameRegistration] - registering with master");
+            if (LogAll)
+                Debug.Log("[GameRegistration] - registering with master");
             client.Send(new RegisterGameMsg()
             {
                 NetworkAddress = NetworkAddress,
@@ -108,7 +174,8 @@ namespace Insight
             //Update with current values from NetworkManager:
             CurrentPlayers = NetworkManager.singleton.numPlayers;
 
-            Debug.Log("[GameRegistration] - status update");
+            if (LogAll)
+                Debug.Log("[GameRegistration] - status update");
             client.Send(new GameStatusMsg()
             {
                 UniqueID = UniqueID,
