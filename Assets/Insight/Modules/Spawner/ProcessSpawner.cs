@@ -41,7 +41,8 @@ namespace Insight
 
         public override void Initialize(InsightServer server, ModuleManager manager)
         {
-
+            if (AbortRun)
+                return;
             this.server = server;
             RegisterHandlers();
         }
@@ -56,9 +57,15 @@ namespace Insight
 
         void Awake()
         {
+            // Mac adjustments to make life easier
 #if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
-            
-            // Mac adjustments to make life easier, user can just enter GameName.app like  windows
+            if (ProcessName.EndsWith(".exe"))
+            {
+                if (LogAll)
+                    Debug.Log("[ProcessSpawner] - Switched file extension.");
+                ProcessName = ProcessName.Replace(".exe", ".app");
+            }
+
             if (!ProcessName.Contains("/Contents/MacOS/"))
             {
                 ProcessName = ProcessName + "/Contents/MacOS/" + ProcessName;
@@ -93,8 +100,7 @@ namespace Insight
             }
             else
             {
-                if (LogAll)
-                    Debug.LogError("[ProcessSpawner] - Path does not exist. " + PathResult);
+                Debug.LogError("[ProcessSpawner] - Path does not exist. " + PathResult);
                 AbortRun = true;
                 return;
             }
@@ -131,6 +137,12 @@ namespace Insight
 
         void HandleRequestSpawnStart(InsightNetworkMessage netMsg)
         {
+            if (AbortRun)
+            {
+                if (LogAll)
+                    Debug.Log("[ProcessSpawner] - Abort HandleRequestSpawnStart");
+                return;
+            }
             RequestSpawnStartMsg message = netMsg.ReadMessage<RequestSpawnStartMsg>();
 
             //Try to start the new process
@@ -156,6 +168,13 @@ namespace Insight
 
         void RegisterToMaster()
         {
+            if (AbortRun)
+            {
+                if (LogAll)
+                    Debug.Log("[ProcessSpawner] - Abort RegisterToMaster");
+                return;
+            }
+
             //Used only if acting as a ChildSpawner under a MasterServer
             if (client && !registrationComplete)
             {
