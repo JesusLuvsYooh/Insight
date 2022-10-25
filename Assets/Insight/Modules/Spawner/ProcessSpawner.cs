@@ -1,7 +1,6 @@
-﻿using Mirror;
+using Mirror;
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -13,8 +12,6 @@ namespace Insight
         InsightServer server;
         InsightClient client;
 
-        public bool LogAll = true;
-
         [Header("Network")]
         [Tooltip("NetworkAddress that spawned processes will use")]
         public string SpawnerNetworkAddress = "localhost";
@@ -24,12 +21,9 @@ namespace Insight
         public int allocatedPorts = 1; //How many transports do you use in MultiplexTransport.
 
         [Header("Paths")]
-        [Tooltip("Example Mac filepath: /Users/yourName/Builds/")]
         public string EditorPath;
-        [Tooltip("Overwrite if builds are not all in same directory.")]
         public string ProcessPath;
         public string ProcessName;
-        private string PathResult;
 
         [Header("Threads")]
         public int MaximumProcesses = 5;
@@ -37,67 +31,24 @@ namespace Insight
         bool registrationComplete;
 
         public RunningProcessContainer[] spawnerProcesses;
-        private bool AbortRun = false;
 
         public override void Initialize(InsightServer server, ModuleManager manager)
         {
-
             this.server = server;
             RegisterHandlers();
         }
 
         public override void Initialize(InsightClient client, ModuleManager manager)
         {
-            if (AbortRun)
-                return;
             this.client = client;
             RegisterHandlers();
         }
 
         void Awake()
         {
-#if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
-            
-            // Mac adjustments to make life easier, user can just enter GameName.app like  windows
-            if (!ProcessName.Contains("/Contents/MacOS/"))
-            {
-                ProcessName = ProcessName + "/Contents/MacOS/" + ProcessName;
-
-                if (ProcessName.EndsWith(".app"))
-                {
-                    if (LogAll)
-                        Debug.Log("[ProcessSpawner] - Auto adjust path for OSX");
-                    ProcessName = ProcessName.Remove(ProcessName.Length - 4);
-                }
-            }
-
-            // Mac prefers not to use dot slash for same directory filepath
-            if (ProcessPath == "./")
-            {
-                if (LogAll)
-                    Debug.Log("[ProcessSpawner] - ProcessPath changed");
-                ProcessPath = "";
-            }
-#endif
-
 #if UNITY_EDITOR
             ProcessPath = EditorPath;
 #endif
-
-            PathResult = System.IO.Path.Combine(ProcessPath, ProcessName);
-
-            if (System.IO.File.Exists(PathResult))
-            {
-                if (LogAll)
-                    Debug.Log("[ProcessSpawner] - Path exists! " + PathResult);
-            }
-            else
-            {
-                if (LogAll)
-                    Debug.LogError("[ProcessSpawner] - Path does not exist. " + PathResult);
-                AbortRun = true;
-                return;
-            }
 
             spawnerProcesses = new RunningProcessContainer[MaximumProcesses];
             for (int i = 0; i < spawnerProcesses.Length; i++)
@@ -110,8 +61,6 @@ namespace Insight
 
         void FixedUpdate()
         {
-            if (AbortRun)
-                return;
             RegisterToMaster();
         }
 
@@ -161,8 +110,7 @@ namespace Insight
             {
                 if (client.isConnected)
                 {
-                    if (LogAll)
-                        Debug.Log("[ProcessSpawner] - Registering to Master");
+                    Debug.LogWarning("[ProcessSpawner] - Registering to Master");
                     client.Send(new RegisterSpawnerMsg()
                     {
                         UniqueID = "", //Can provide a password to authenticate to the master as a trusted spawner
@@ -176,17 +124,16 @@ namespace Insight
         void CheckSpawnedProcessHealth()
         {
             //Check to see if a previously running process exited without warning
-            for (int i = 0; i < spawnerProcesses.Length; i++)
+            for(int i = 0; i < spawnerProcesses.Length; i++)
             {
-                if (spawnerProcesses[i].process == null)
+                if(spawnerProcesses[i].process == null)
                 {
                     continue;
                 }
 
                 if (spawnerProcesses[i].process.HasExited)
                 {
-                    if (LogAll)
-                        Debug.Log("Removing process that has exited");
+                    Debug.Log("Removing process that has exited");
                     spawnerProcesses[i].process = null;
                     spawnerProcesses[i].pid = 0;
                     spawnerProcesses[i].uniqueID = "";
@@ -195,7 +142,7 @@ namespace Insight
             }
 
             //If running as a remote spawner report the current running process count back to the MasterSpawner
-            if (client != null)
+            if(client != null)
             {
                 client.Send(new SpawnerStatusMsg()
                 {
@@ -208,7 +155,7 @@ namespace Insight
         {
             KillSpawnMsg message = netMsg.ReadMessage<KillSpawnMsg>();
 
-            for (int i = 0; i < spawnerProcesses.Length; i++)
+            for(int i = 0; i < spawnerProcesses.Length; i++)
             {
                 if (spawnerProcesses[i].uniqueID.Equals(message.UniqueID))
                 {
@@ -234,8 +181,7 @@ namespace Insight
             {
                 spawnProperties.UniqueID = Guid.NewGuid().ToString();
 
-                if (LogAll)
-                    Debug.Log("[ProcessSpawner] - UniqueID was not provided for spawn. Generating: " + spawnProperties.UniqueID);
+                Debug.LogWarning("[ProcessSpawner] - UniqueID was not provided for spawn. Generating: " + spawnProperties.UniqueID);
             }
 
             Process p = new Process();
@@ -246,25 +192,13 @@ namespace Insight
             //Args to pass: Port, Scene, UniqueID...
             p.StartInfo.Arguments = ArgsString() +
                 " -NetworkAddress " + SpawnerNetworkAddress +
-                " -NetworkPort " + (StartingNetworkPort + thisPort * allocatedPorts) +
+                " -NetworkPort " + (StartingNetworkPort + thisPort * allocatedPorts) + 
                 " -SceneName " + spawnProperties.SceneName +
                 " -UniqueID " + spawnProperties.UniqueID; //What to do if the UniqueID or any other value is null??
 
-            if (System.IO.File.Exists(p.StartInfo.FileName))
-            {
-                if (LogAll)
-                    Debug.Log("[ProcessSpawner] - Path exists!" + p.StartInfo.FileName);
-            }
-            else
-            {
-                Debug.LogError("[ProcessSpawner] - Path does not exist. " + p.StartInfo.FileName);
-                return false;
-            }
-
             if (p.Start())
             {
-                if (LogAll)
-                    Debug.Log("[ProcessSpawner]: spawning: " + p.StartInfo.FileName + "; args=" + p.StartInfo.Arguments);
+                Debug.Log("[ProcessSpawner]: spawning: " + p.StartInfo.FileName + "; args=" + p.StartInfo.Arguments);
             }
             else
             {
@@ -292,25 +226,24 @@ namespace Insight
 
         int GetPort()
         {
-            for (int i = 0; i < spawnerProcesses.Length; i++)
+            for(int i = 0; i < spawnerProcesses.Length; i++)
             {
-                if (spawnerProcesses[i].process == null)
+                if(spawnerProcesses[i].process == null)   
                 {
                     return i;
                 }
             }
 
-            //if (LogAll) important to display, but do not flag as error
-            Debug.LogWarning("[ProcessSpawner] - Maximum Process Count Reached");
+            Debug.LogError("[ProcessSpawner] - Maximum Process Count Reached");
             return -1;
         }
 
         int GetRunningProcessCount()
         {
             int counter = 0;
-            for (int i = 0; i < spawnerProcesses.Length; i++)
+            for(int i = 0; i < spawnerProcesses.Length; i++)
             {
-                if (spawnerProcesses[i].process != null)
+                if(spawnerProcesses[i].process != null)   
                 {
                     counter++;
                 }
