@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 114424672232905856}
   - component: {fileID: 114092492723764628}
   - component: {fileID: 5718592856820291868}
-  - component: {fileID: 2900258155413334504}
+  - component: {fileID: 3454945445600430076}
   m_Layer: 0
   m_Name: GameServer(InsightClient)
   m_TagString: Untagged
@@ -51,7 +51,11 @@ MonoBehaviour:
   DontDestroy: 1
   AutoStart: 1
   networkAddress: localhost
+  StayConnected: 1
   AutoReconnect: 1
+  AuthClientUponConnect: 0
+  NoisyLogs: 1
+  clientAuthentication: {fileID: 0}
   ReconnectDelayInSeconds: 5
 --- !u!114 &114092492723764628
 MonoBehaviour:
@@ -79,7 +83,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tickRate: 30
---- !u!114 &2900258155413334504
+--- !u!114 &3454945445600430076
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -88,21 +92,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 1763708289631472}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c7424c1070fad4ba2a7a96b02fbeb4bb, type: 3}
+  m_Script: {fileID: 11500000, guid: 6b0fecffa3f624585964b0d0eb21b18e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  port: 7000
+  Port: 7000
+  DualMode: 1
   NoDelay: 1
-  SendTimeout: 5000
-  ReceiveTimeout: 0
-  serverMaxMessageSize: 16384
-  serverMaxReceivesPerTick: 10000
-  serverSendQueueLimitPerConnection: 10000
-  serverReceiveQueueLimitPerConnection: 10000
-  clientMaxMessageSize: 16384
-  clientMaxReceivesPerTick: 1000
-  clientSendQueueLimit: 10000
-  clientReceiveQueueLimit: 10000
+  Interval: 10
+  Timeout: 10000
+  FastResend: 2
+  CongestionWindow: 0
+  SendWindowSize: 4096
+  ReceiveWindowSize: 4096
+  MaxRetransmit: 40
+  NonAlloc: 1
+  MaximizeSendReceiveBuffersToOSLimit: 1
+  ReliableMaxMessageSize: 298449
+  UnreliableMaxMessageSize: 1199
+  debugLog: 0
+  statisticsGUI: 0
+  statisticsLog: 0
 --- !u!1 &1802009185712394
 GameObject:
   m_ObjectHideFlags: 0
@@ -146,7 +155,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72fd0eb9c3a916a42b979bafd1098e66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LogAll: 1
   GameScene: 
   NetworkAddress: 
   NetworkPort: 0
