@@ -40,6 +40,21 @@ namespace Insight
 
         public bool isConnected { get { return connectState == ConnectState.Connected; } }
 
+        public virtual void Awake()
+		{
+            NetworkLoop.OnEarlyUpdate += NetworkEarlyUpdate;
+            NetworkLoop.OnLateUpdate += NetworkLateUpdate;
+        }
+
+        void OnDestroy()
+		{
+            NetworkLoop.OnEarlyUpdate -= NetworkEarlyUpdate;
+            NetworkLoop.OnLateUpdate -= NetworkLateUpdate;
+        }
+
+        public abstract void NetworkEarlyUpdate();
+        public abstract void NetworkLateUpdate();
+
         Transport _transport;
         public virtual Transport transport
         {
@@ -123,11 +138,7 @@ namespace Insight
             // read message type (varint)
             try
             {
-#if MIRROR_39_0_OR_NEWER
                 msgType = messageReader.ReadUShort();
-#else
-                msgType = messageReader.ReadUInt16();
-#endif
                 return true;
             }
             catch (System.IO.EndOfStreamException)

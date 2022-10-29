@@ -6,7 +6,7 @@ namespace Insight
 {
     public class InsightClient : InsightCommon
     {
-        public static InsightClient instance;
+		public static InsightClient instance;
 
         public bool AutoReconnect = true;
         protected int clientID = -1; //-1 = never connected, 0 = disconnected, 1 = connected
@@ -16,22 +16,25 @@ namespace Insight
 
         public float ReconnectDelayInSeconds = 5f;
         float _reconnectTimer;
+		bool active;
 
-        void Awake()
-        {
-            if(DontDestroy)
-            {
-                if(instance != null && instance != this) {
+		public override void Awake()
+		{
+            base.Awake();
+            if(DontDestroy){
+                if(instance != null && instance != this)
+				{
                     Destroy(gameObject);
                     return;
                 }
                 instance = this;
                 DontDestroyOnLoad(this);
-            } else {
+            } else
+			{
                 instance = this;
             }
         }
-
+		
         public virtual void Start()
         {
             Application.runInBackground = true;
@@ -52,18 +55,21 @@ namespace Insight
             }
         }
 
-        public void NetworkEarlyUpdate()
+        public override void NetworkEarlyUpdate()
         {
-            CheckConnection();
-
-            CheckCallbackTimeouts();
-
             transport.ClientEarlyUpdate();
         }
 
-        public void NetworkLateUpdate()
+        public override void NetworkLateUpdate()
         {
+            CheckCallbackTimeouts();
+
             transport.ClientLateUpdate();
+        }
+
+        public virtual void Update()
+        {
+            CheckConnection();
         }
 
         public void StartInsight(string Address)
@@ -81,6 +87,8 @@ namespace Insight
 
         public override void StartInsight()
         {
+			active = true;
+			
             transport.ClientConnect(networkAddress);
 
             OnStartInsight();
@@ -90,6 +98,8 @@ namespace Insight
 
         public void StartInsight(Uri uri)
         {
+			active = true;
+			
             transport.ClientConnect(uri);
 
             OnStartInsight();
@@ -99,15 +109,22 @@ namespace Insight
 
         public override void StopInsight()
         {
+			active = false;
+			
             transport.ClientDisconnect();
-            OnStopInsight();
+
+            if(connectState != ConnectState.Disconnected){
+                connectState = ConnectState.Disconnected;
+
+                OnStopInsight();
+            }
         }
 
         private void CheckConnection()
         {
             if (AutoReconnect)
             {
-                if (!isConnected && (_reconnectTimer > 0 && _reconnectTimer < Time.time))
+                if (active && !isConnected && (_reconnectTimer > 0 && _reconnectTimer < Time.time))
                 {
                     Debug.Log("[InsightClient] - Trying to reconnect...");
                     _reconnectTimer = Time.realtimeSinceStartup + ReconnectDelayInSeconds;
@@ -118,11 +135,7 @@ namespace Insight
 
         public void Send(byte[] data)
         {
-#if MIRROR_39_0_OR_NEWER
             transport.ClientSend(new ArraySegment<byte>(data), 0);
-#else
-            transport.ClientSend(0,  new ArraySegment<byte>(data));
-#endif
         }
 
         public void Send<T>(T msg) where T : Message
@@ -140,11 +153,7 @@ namespace Insight
 
             NetworkWriter writer = new NetworkWriter();
             int msgType = GetId(default(T) != null ? typeof(T) : msg.GetType());
-#if MIRROR_39_0_OR_NEWER
             writer.WriteUShort((ushort)msgType);
-#else
-            writer.WriteUInt16((ushort)msgType);
-#endif
             int callbackId = 0;
             if (callback != null)
             {
@@ -155,17 +164,9 @@ namespace Insight
                     timeout = Time.realtimeSinceStartup + callbackTimeout
                 });
             }
-#if MIRROR_39_0_OR_NEWER
             writer.WriteInt(callbackId);
-#else
-            writer.WriteInt32(callbackId);
-#endif
             Writer<T>.write.Invoke(writer, msg);
-#if MIRROR_39_0_OR_NEWER
             transport.ClientSend(new ArraySegment<byte>(writer.ToArray()), 0);
-#else
-            transport.ClientSend(0, new ArraySegment<byte>(writer.ToArray()));
-#endif
         }
 
         void HandleCallbackHandler(CallbackStatus status, NetworkReader reader)
@@ -184,9 +185,11 @@ namespace Insight
 
         void OnDisconnected()
         {
-            connectState = ConnectState.Disconnected;
+            if(connectState != ConnectState.Disconnected){
+                connectState = ConnectState.Disconnected;
 
-            StopInsight();
+                OnStopInsight();
+            }
         }
 
         protected void HandleBytes(ArraySegment<byte> data, int i)
@@ -195,11 +198,7 @@ namespace Insight
             NetworkReader reader = new NetworkReader(data);
             if(UnpackMessage(reader, out int msgType))
             {
-#if MIRROR_39_0_OR_NEWER
                 int callbackId = reader.ReadInt();
-#else
-                int callbackId = reader.ReadInt32();
-#endif
                 InsightNetworkMessage msg = new InsightNetworkMessage(insightNetworkConnection, callbackId)
                 {
                     msgType = msgType,

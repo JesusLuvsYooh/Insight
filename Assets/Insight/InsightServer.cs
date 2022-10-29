@@ -7,27 +7,29 @@ namespace Insight
 {
     public class InsightServer : InsightCommon
     {
-        public static InsightServer instance;
-		
+		public static InsightServer instance;
+
         protected int serverHostId = -1; //-1 = never connected, 0 = disconnected, 1 = connected
         protected Dictionary<int, InsightNetworkConnection> connections = new Dictionary<int, InsightNetworkConnection>();
         protected List<SendToAllFinishedCallbackData> sendToAllFinishedCallbacks = new List<SendToAllFinishedCallbackData>();
 
-         void Awake()
-        {
-            if(DontDestroy)
-            {
-                if(instance != null && instance != this) {
+		public override void Awake()
+		{
+            base.Awake();
+            if(DontDestroy){
+                if(instance != null && instance != this)
+				{
                     Destroy(gameObject);
                     return;
                 }
                 instance = this;
                 DontDestroyOnLoad(this);
-            } else {
+            } else
+			{
                 instance = this;
             }
         }
-
+		
         public virtual void Start()
         {
             Application.runInBackground = true;
@@ -43,15 +45,15 @@ namespace Insight
             }
         }
 
-        public void NetworkEarlyUpdate()
+        public override void NetworkEarlyUpdate()
         {
-            CheckCallbackTimeouts();
-
             transport.ServerEarlyUpdate();
         }
 
-        public void NetworkLateUpdate()
+        public override void NetworkLateUpdate()
         {
+            CheckCallbackTimeouts();
+
             transport.ServerLateUpdate();
         }
 
@@ -107,13 +109,8 @@ namespace Insight
         void HandleData(int connectionId, ArraySegment<byte> data, int i)
         {
             NetworkReader reader = new NetworkReader(data);
-#if MIRROR_39_0_OR_NEWER
             short msgType = reader.ReadShort();
             int callbackId = reader.ReadInt();
-#else
-            short msgType = reader.ReadInt16();
-            int callbackId = reader.ReadInt32();
-#endif
             InsightNetworkConnection insightNetworkConnection;
             if (!connections.TryGetValue(connectionId, out insightNetworkConnection))
             {
@@ -180,22 +177,14 @@ namespace Insight
             {
                 NetworkWriter writer = new NetworkWriter();
                 int msgType = GetId(default(Message) != null ? typeof(Message) : msg.GetType());
-#if MIRROR_39_0_OR_NEWER
                 writer.WriteUShort((ushort)msgType);
-#else
-                writer.WriteUInt16((ushort)msgType);
-#endif
                 int callbackId = 0;
                 if (callback != null)
                 {
                     callbackId = ++callbackIdIndex; // pre-increment to ensure that id 0 is never used.
                     callbacks.Add(callbackId, new CallbackData() { callback = callback, timeout = Time.realtimeSinceStartup + callbackTimeout });
                 }
-#if MIRROR_39_0_OR_NEWER
                 writer.WriteInt(callbackId);
-#else
-                writer.WriteInt32(callbackId);
-#endif
                 Writer<T>.write.Invoke(writer, msg);
 
                 return connections[connectionId].Send(writer.ToArray());
@@ -213,11 +202,7 @@ namespace Insight
         {
             if (transport.ServerActive())
             {
-#if MIRROR_39_0_OR_NEWER
                 transport.ServerSend(connectionId, new ArraySegment<byte>(data), 0);
-#else
-                transport.ServerSend(connectionId, 0, new ArraySegment<byte>(data));
-#endif
                 return true;
             }
             Debug.LogError("Server.Send: not connected!", this);
