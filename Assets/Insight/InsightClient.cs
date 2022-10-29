@@ -6,35 +6,44 @@ namespace Insight
 {
     public class InsightClient : InsightCommon
     {
-		public static InsightClient instance;
+        public static InsightClient instance;
 
+        [Tooltip("-Optional experimental false setting-\nStay connected to Master Server upon joining Game Server, this is required for certain features like cross-server chat.\nFalse will lighten the Master Server load, using fewer resources and allowing more connections.")]
+        public bool StayConnected = true;
         public bool AutoReconnect = true;
+        public bool AuthClientUponConnect = false;
+        [Tooltip("Set false to log only warnings and errors, ideal for release build.")]
+        public bool NoisyLogs = true;
+
         protected int clientID = -1; //-1 = never connected, 0 = disconnected, 1 = connected
         protected int connectionID = 0;
 
         InsightNetworkConnection insightNetworkConnection;
+        public ClientAuthentication clientAuthentication;
 
         public float ReconnectDelayInSeconds = 5f;
         float _reconnectTimer;
-		bool active;
+        bool active;
 
-		public override void Awake()
-		{
+        public override void Awake()
+        {
             base.Awake();
-            if(DontDestroy){
-                if(instance != null && instance != this)
-				{
+            if (DontDestroy)
+            {
+                if (instance != null && instance != this)
+                {
                     Destroy(gameObject);
                     return;
                 }
                 instance = this;
                 DontDestroyOnLoad(this);
-            } else
-			{
+            }
+            else
+            {
                 instance = this;
             }
         }
-		
+
         public virtual void Start()
         {
             Application.runInBackground = true;
@@ -87,8 +96,8 @@ namespace Insight
 
         public override void StartInsight()
         {
-			active = true;
-			
+            active = true;
+
             transport.ClientConnect(networkAddress);
 
             OnStartInsight();
@@ -98,8 +107,8 @@ namespace Insight
 
         public void StartInsight(Uri uri)
         {
-			active = true;
-			
+            active = true;
+
             transport.ClientConnect(uri);
 
             OnStartInsight();
@@ -109,11 +118,12 @@ namespace Insight
 
         public override void StopInsight()
         {
-			active = false;
-			
+            active = true;
+
             transport.ClientDisconnect();
 
-            if(connectState != ConnectState.Disconnected){
+            if (connectState != ConnectState.Disconnected)
+            {
                 connectState = ConnectState.Disconnected;
 
                 OnStopInsight();
@@ -126,7 +136,7 @@ namespace Insight
             {
                 if (active && !isConnected && (_reconnectTimer > 0 && _reconnectTimer < Time.time))
                 {
-                    Debug.Log("[InsightClient] - Trying to reconnect...");
+                    if(NoisyLogs) Debug.Log("[InsightClient] - Trying to reconnect...");
                     _reconnectTimer = Time.realtimeSinceStartup + ReconnectDelayInSeconds;
                     StartInsight();
                 }
@@ -177,15 +187,22 @@ namespace Insight
         {
             if (insightNetworkConnection != null)
             {
-                Debug.Log("[InsightClient] - Connected to Insight Server");
+                if(NoisyLogs) Debug.Log("[InsightClient] - Connected to Insight Server");
                 connectState = ConnectState.Connected;
+
+                if (InsightServer.instance == null && AuthClientUponConnect)
+                {
+                    if (clientAuthentication)
+                        clientAuthentication.SendLoginMsg();
+                }
             }
             else Debug.LogError("Skipped Connect message handling because m_Connection is null.");
         }
 
         void OnDisconnected()
         {
-            if(connectState != ConnectState.Disconnected){
+            if (connectState != ConnectState.Disconnected)
+            {
                 connectState = ConnectState.Disconnected;
 
                 OnStopInsight();
@@ -230,19 +247,44 @@ namespace Insight
 
         void OnApplicationQuit()
         {
-            Debug.Log("[InsightClient] Stopping Client");
+            if (NoisyLogs)
+                Debug.Log("[InsightClient] Stopping Client");
             StopInsight();
         }
 
         ////------------Virtual Handlers-------------
         public virtual void OnStartInsight()
         {
-            Debug.Log("[InsightClient] - Connecting to Insight Server: " + networkAddress);
+            if (NoisyLogs)
+                Debug.Log("[InsightClient] - Connecting to Insight Server: " + networkAddress);
         }
 
         public virtual void OnStopInsight()
         {
-            Debug.Log("[InsightClient] - Disconnecting from Insight Server");
+            if (NoisyLogs)
+                Debug.Log("[InsightClient] - Disconnecting from Insight Server");
+        }
+
+        public void TemporarilyDisconnectFromInsightServer()
+        {
+            if (StayConnected == false)
+            {
+                if (NoisyLogs)
+                    Debug.Log("[InsightClient] - Temporarily disconnecting from Insight Server");
+                AutoReconnect = false;
+                StopInsight();
+            }
+        }
+
+        public void ReconnectToInsightServer()
+        {
+            if (StayConnected == false)
+            {
+                if (NoisyLogs)
+                    Debug.Log("[InsightClient] - Reconnecting to Insight Server");
+                AutoReconnect = true;
+                StartInsight();
+            }
         }
     }
 }

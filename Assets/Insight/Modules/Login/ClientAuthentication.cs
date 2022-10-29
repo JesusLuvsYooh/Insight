@@ -10,6 +10,8 @@ namespace Insight
         InsightClient client;
 
         public string uniqueID;
+        private string userName;
+        private string userPassword;
 
         //This is put in the GUI. Just for example purposes
         internal string loginResponse;
@@ -20,6 +22,8 @@ namespace Insight
             this.client = client;
 
             RegisterHandlers();
+
+            client.clientAuthentication = this;
         }
 
         void RegisterHandlers()
@@ -27,9 +31,9 @@ namespace Insight
 
         }
 
-        public void SendLoginMsg(string username, string password)
+        public void SendLoginMsg()
         {
-            client.Send(new LoginMsg() { AccountName = username, AccountPassword = password }, (reader) =>
+            client.Send(new LoginMsg() { AccountName = userName, AccountPassword = userPassword }, (reader) =>
             {
                 LoginResponseMsg msg = reader.ReadMessage<LoginResponseMsg>();
 
@@ -47,6 +51,13 @@ namespace Insight
                     Debug.LogError("[ClientAuthentication] - Callback Error: Login attempt timed out");
                 }
             });
+        }
+
+        // we store details for later use, so client does not need UI input for a later reconnection to MasterServer
+        public void SetClientLoginDetails(string username, string password)
+        {
+            userName = username;
+            userPassword = password;
         }
     }
 }

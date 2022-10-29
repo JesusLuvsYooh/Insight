@@ -7,29 +7,35 @@ namespace Insight
 {
     public class InsightServer : InsightCommon
     {
-		public static InsightServer instance;
+        public static InsightServer instance;
 
+        [Tooltip("Set false to log only warnings and errors, ideal for release build.")]
+        public bool NoisyLogs = true;
+        public bool autoAuthClients = false;
         protected int serverHostId = -1; //-1 = never connected, 0 = disconnected, 1 = connected
         protected Dictionary<int, InsightNetworkConnection> connections = new Dictionary<int, InsightNetworkConnection>();
         protected List<SendToAllFinishedCallbackData> sendToAllFinishedCallbacks = new List<SendToAllFinishedCallbackData>();
+        public ServerAuthentication serverAuthentication;
 
-		public override void Awake()
-		{
+        public override void Awake()
+        {
             base.Awake();
-            if(DontDestroy){
-                if(instance != null && instance != this)
-				{
+            if (DontDestroy)
+            {
+                if (instance != null && instance != this)
+                {
                     Destroy(gameObject);
                     return;
                 }
                 instance = this;
                 DontDestroyOnLoad(this);
-            } else
-			{
+            }
+            else
+            {
                 instance = this;
             }
         }
-		
+
         public virtual void Start()
         {
             Application.runInBackground = true;
@@ -59,7 +65,7 @@ namespace Insight
 
         public override void StartInsight()
         {
-            Debug.Log("[InsightServer] - Start");
+            if(NoisyLogs) Debug.Log("[InsightServer] - Start");
             transport.ServerStart();
             serverHostId = 0;
 
@@ -83,7 +89,8 @@ namespace Insight
 
         void HandleConnect(int connectionId)
         {
-            Debug.Log("[InsightServer] - Client connected connectionID: " + connectionId, this);
+            if (NoisyLogs)
+                Debug.Log("[InsightServer] - Client connected connectionID: " + connectionId, this);
 
             // get ip address from connection
             string address = GetConnectionInfo(connectionId);
@@ -92,11 +99,20 @@ namespace Insight
             InsightNetworkConnection conn = new InsightNetworkConnection();
             conn.Initialize(this, address, serverHostId, connectionId);
             AddConnection(conn);
+
+           // string UniqueId = Guid.NewGuid().ToString();
+            //serverAuthentication.registeredUsers.Add(new UserContainer()
+            //{
+            //    username = "",
+            //    uniqueId = UniqueId,
+            //    connectionId = connectionId
+            //});
         }
 
         void HandleDisconnect(int connectionId)
         {
-            Debug.Log("[InsightServer] - Client disconnected connectionID: " + connectionId, this);
+            if (NoisyLogs)
+                Debug.Log("[InsightServer] - Client disconnected connectionID: " + connectionId, this);
 
             InsightNetworkConnection conn;
             if (connections.TryGetValue(connectionId, out conn))
@@ -261,7 +277,8 @@ namespace Insight
 
         void OnApplicationQuit()
         {
-            Debug.Log("[InsightServer] Stopping Server");
+            if (NoisyLogs)
+                Debug.Log("[InsightServer] Stopping Server");
             transport.ServerStop();
         }
 
@@ -296,12 +313,14 @@ namespace Insight
         ////----------virtual handlers--------------//
         public virtual void OnStartInsight()
         {
-            Debug.Log("[InsightServer] - Server started listening");
+            if (NoisyLogs)
+                Debug.Log("[InsightServer] - Server started listening");
         }
 
         public virtual void OnStopInsight()
         {
-            Debug.Log("[InsightServer] - Server stopping");
+            if (NoisyLogs)
+                Debug.Log("[InsightServer] - Server stopping");
         }
     }
 }

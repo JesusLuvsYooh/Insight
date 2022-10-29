@@ -20,7 +20,8 @@ namespace Insight.Examples
         //MsgSender
         public void SendLoginMsg()
         {
-            clientAuthentication.SendLoginMsg(usernameField.text, passwordField.text);
+            clientAuthentication.SetClientLoginDetails(usernameField.text, passwordField.text);
+            clientAuthentication.SendLoginMsg();
         }
     }
 }

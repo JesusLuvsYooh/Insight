@@ -17,6 +17,8 @@ namespace Insight
         {
             this.server = server;
 
+            server.serverAuthentication = this;
+
             RegisterHandlers();
 
             server.transport.OnServerDisconnected += HandleDisconnect;
@@ -33,7 +35,8 @@ namespace Insight
         {
             LoginMsg message = netMsg.ReadMessage<LoginMsg>();
 
-            Debug.Log("[ServerAuthentication] - Login Received: " + message.AccountName + " / " + message.AccountPassword);
+            if (InsightServer.instance.NoisyLogs)
+                Debug.Log("[ServerAuthentication] - Login Received: " + message.AccountName + " / " + message.AccountPassword);
 
             if(EnforceAuthentication)
             {

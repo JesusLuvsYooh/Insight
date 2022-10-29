@@ -24,6 +24,8 @@ namespace Insight
 
         bool _spawnInProgress;
 
+        private string optionalClientMatchmakingData = "SuperAwesomeGame";
+
         public void Awake()
         {
             AddDependency<MasterSpawner>();
@@ -39,8 +41,8 @@ namespace Insight
             masterSpawner = manager.GetModule<MasterSpawner>();
 
             RegisterHandlers();
-			
-			server.transport.OnServerDisconnected += HandleDisconnect;
+
+            server.transport.OnServerDisconnected += HandleDisconnect;
 
             InvokeRepeating("InvokedUpdate", MatchMakingPollRate, MatchMakingPollRate);
         }
@@ -59,8 +61,12 @@ namespace Insight
 
         void HandleStartMatchSearchMsg(InsightNetworkMessage netMsg)
         {
-            Debug.Log("[MatchMaking] - Player joining MatchMaking.");
-
+            if (InsightServer.instance.NoisyLogs)
+                Debug.Log("[MatchMaking] - Player joining MatchMaking.");
+            // Optional player sent data, currently set as scene request (not recommended) 
+            optionalClientMatchmakingData = netMsg.ReadMessage<StartMatchMakingMsg>().SceneName;
+            if (InsightServer.instance.NoisyLogs)
+                Debug.Log("[MatchMaking] - Client data received: " + optionalClientMatchmakingData);
             playerQueue.Add(authModule.GetUserByConnection(netMsg.connectionId));
         }
 
@@ -75,8 +81,8 @@ namespace Insight
                 }
             }
         }
-		
-		void HandleDisconnect(int connectionId)
+
+        void HandleDisconnect(int connectionId)
         {
             foreach (UserContainer user in playerQueue)
             {
@@ -86,12 +92,12 @@ namespace Insight
                     break;
                 }
             }
-			foreach(MatchContainer match in matchList)
-			{
-                foreach(UserContainer user in match.matchUsers)
-				{
-                    if(user.connectionId == connectionId)
-					{
+            foreach (MatchContainer match in matchList)
+            {
+                foreach (UserContainer user in match.matchUsers)
+                {
+                    if (user.connectionId == connectionId)
+                    {
                         match.matchUsers.Remove(user);
                         break;
                     }
@@ -103,13 +109,14 @@ namespace Insight
         {
             if (playerQueue.Count < MinimumPlayersForGame)
             {
-                Debug.Log("[MatchMaking] - Minimum players in queue not reached.");
+                if (InsightServer.instance.NoisyLogs)
+                    Debug.Log("[MatchMaking] - Minimum players in queue not reached.");
                 return;
             }
 
             if (masterSpawner.registeredSpawners.Count == 0)
             {
-                Debug.Log("[MatchMaking] - No spawners for players in queue.");
+                Debug.LogWarning("[MatchMaking] - No spawners for players in queue.");
                 return;
             }
 
@@ -124,8 +131,14 @@ namespace Insight
             //Specify the match details
             RequestSpawnStartMsg requestSpawnStart = new RequestSpawnStartMsg()
             {
-                //This should not be hard coded. Where should it go?
-                SceneName = "SuperAwesomeGame",
+                //Currently sent via request of client during matchmaking, completely optional, could be used for rare case
+                // weirdly it was setup to send requested scene name, but then was hardcoded to always be "SuperAwesomeGame"
+                // args are received in GameRegistration script, add scenes into inspector (verifiedScenes) on GameServer/GameRegistration prefab
+                // (if you want clients to send request scene still)
+                SceneName = optionalClientMatchmakingData,
+
+                //This should not be hard coded. Might not be used at all if your GameServer.exe controls scenes.
+                //SceneName = "SuperAwesomeGame",
                 UniqueID = uniqueID
             };
 
@@ -133,7 +146,7 @@ namespace Insight
 
             //This should check to make sure that the max players is not higher than the number in queue
             //Add the players from the queue into this match:
-            for(int i = playerQueue.Count -1; i >= 0; i--)
+            for (int i = playerQueue.Count - 1; i >= 0; i--)
             {
                 matchUsers.Add(playerQueue[i]);
                 playerQueue.RemoveAt(i);
@@ -165,7 +178,7 @@ namespace Insight
                 match.Update();
             }
 
-            for(int i = matchList.Count - 1; i >= 0; i--)
+            for (int i = matchList.Count - 1; i >= 0; i--)
             {
                 if (matchList[i].MatchComplete)
                 {
@@ -209,9 +222,9 @@ namespace Insight
 
         public void Update()
         {
-            if(!InitMatch)
+            if (!InitMatch)
             {
-                if(IsSpawnServerActive())
+                if (IsSpawnServerActive())
                 {
                     InitMatch = true;
                     MatchServer = matchModule.gameManager.GetGameByUniqueID(matchProperties.UniqueID);
@@ -231,7 +244,7 @@ namespace Insight
                     CancelMatch();
                 }
 
-                Debug.Log("Server not active at this time");
+                Debug.LogWarning("Server not active at this time");
                 return false;
             }
             return true;
