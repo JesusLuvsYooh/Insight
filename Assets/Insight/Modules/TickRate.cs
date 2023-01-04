@@ -8,7 +8,11 @@ namespace Insight
 
         void Start() 
         {
-            Application.targetFrameRate = tickRate;
+            // a check to protect server hardware, whilst not overwriting args.
+            if (Application.targetFrameRate <= 0 || Application.targetFrameRate > 120)
+            {
+                Application.targetFrameRate = tickRate;
+            }
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 
+// Add any new args in this script
+
 namespace Insight
 {
     public class InsightArgs
@@ -19,13 +21,29 @@ namespace Insight
             NetworkPort = ExtractValueInt(Names.NetworkPort, 7777);
             UniqueID = ExtractValue(Names.UniqueID, "");
             SceneName = ExtractValue(Names.SceneName, "");
+            FrameRate = ExtractValueInt(Names.FrameRate, 30);
+            GameMode = ExtractValueInt(Names.GameMode, 7777);
+            ProcessName = ExtractValue(Names.ProcessName, "GameServer.exe");
+            ProcessesMax = ExtractValueInt(Names.ProcessesMax, 5);
+            ProcessIdleExit = ExtractValueInt(Names.ProcessIdleExit, 60);
+            PlayersMax = ExtractValueInt(Names.PlayersMax, 100);
+            NoisyLogs = ExtractValue(Names.NoisyLogs, "on");
+            ServerID = ExtractValue(Names.ServerID, "");
         }
 
         #region Arguments
-        public string NetworkAddress { get; private set; }
-        public int NetworkPort { get; private set; }
-        public string UniqueID { get; private set; }
-        public string SceneName { get; private set; }
+        public string NetworkAddress { get; private set; } // example, 123.1.1.1
+        public int NetworkPort { get; private set; } // example, 7777
+        public string UniqueID { get; private set; } // ignore, auto set for spawned GameServers
+        public string SceneName { get; private set; } // example, Map2
+        public int FrameRate { get; private set; } // example, 30
+        public int GameMode { get; private set; } // example, 1 = free for all, 2 deathmatch
+        public string ProcessName { get; private set; } // example. GameServer.exe
+        public int ProcessesMax { get; private set; } // amount of GameServers per VPS Spawner, example, 5
+        public int ProcessIdleExit { get; private set; } // seconds to close GameServer if no players, example, 60
+        public int PlayersMax { get; private set; } // max connections per spawned GameServer, example, 50
+        public string NoisyLogs { get; private set; } // for debugging, on/off, example, on
+        public string ServerID { get; private set; } // future use for api or invite codes
         #endregion
 
         #region Helper methods
@@ -57,6 +75,14 @@ namespace Insight
             public string NetworkPort { get { return "-NetworkPort"; } }
             public string UniqueID { get { return "-UniqueID"; } }
             public string SceneName { get { return "-SceneName"; } }
+            public string FrameRate { get { return "-FrameRate"; } }
+            public string GameMode { get { return "-GameMode"; } }
+            public string ProcessName { get { return "-ProcessName"; } }
+            public string ProcessesMax { get { return "-ProcessesMax"; } }
+            public string ProcessIdleExit { get { return "-ProcessIdleExit"; } }
+            public string PlayersMax { get { return "-PlayersMax"; } }
+            public string NoisyLogs { get { return "-NoisyLogs"; } }
+            public string ServerID { get { return "-ServerID"; } }
         }
     }
 }

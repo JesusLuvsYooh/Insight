@@ -1,0 +1,1 @@
+start cmd /k MasterServer.exe -NetworkAddress 127.0.0.1 -NetworkPort 6969 -FrameRate 15 -ProcessName GameServer.exe -ProcessesMax 5 -ProcessIdleExit 10 -PlayersMax 100 -NoisyLogs on

@@ -1,0 +1,1 @@
+start cmd /k RemoteSpawner.exe -NetworkAddress localhost

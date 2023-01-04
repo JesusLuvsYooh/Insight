@@ -13,7 +13,7 @@ namespace Insight
         public bool NoisyLogs = true;
         public bool autoAuthClients = false;
         protected int serverHostId = -1; //-1 = never connected, 0 = disconnected, 1 = connected
-        protected Dictionary<int, InsightNetworkConnection> connections = new Dictionary<int, InsightNetworkConnection>();
+        public Dictionary<int, InsightNetworkConnection> connections = new Dictionary<int, InsightNetworkConnection>();
         protected List<SendToAllFinishedCallbackData> sendToAllFinishedCallbacks = new List<SendToAllFinishedCallbackData>();
         public ServerAuthentication serverAuthentication;
 
@@ -87,8 +87,22 @@ namespace Insight
             OnStopInsight();
         }
 
+        
+
         void HandleConnect(int connectionId)
         {
+            Debug.LogWarning("connectionId: " + connectionId);
+            if (serverID == 0)
+            {
+                serverID = connectionId;
+            }
+            // cant remember what this was for?
+            //if (connectionId != serverID)
+            //{
+            //    Debug.LogWarning("Ignore Connection!");
+            //    return;
+            //}
+
             if (NoisyLogs)
                 Debug.Log("[InsightServer] - Client connected connectionID: " + connectionId, this);
 
@@ -100,13 +114,19 @@ namespace Insight
             conn.Initialize(this, address, serverHostId, connectionId);
             AddConnection(conn);
 
+            //check ban list for matching address
+            //    if true
+            //        {
+                   // HandleDisconnect(connectionId);
+              //  }
+
            // string UniqueId = Guid.NewGuid().ToString();
-            //serverAuthentication.registeredUsers.Add(new UserContainer()
-            //{
-            //    username = "",
-            //    uniqueId = UniqueId,
-            //    connectionId = connectionId
-            //});
+           //serverAuthentication.registeredUsers.Add(new UserContainer()
+           //{
+           //    username = "",
+           //    uniqueId = UniqueId,
+           //    connectionId = connectionId
+           //});
         }
 
         void HandleDisconnect(int connectionId)
@@ -122,8 +142,21 @@ namespace Insight
             }
         }
 
+        int serverID = 0;
+
         void HandleData(int connectionId, ArraySegment<byte> data, int i)
         {
+            //Debug.LogWarning("connectionId: " + connectionId);
+            //if (serverID == 0)
+            //{
+            //    serverID = connectionId;
+            //}
+            //if (connectionId != serverID)
+            //{
+            //    Debug.LogWarning("Ignore Connection!");
+            //    return;
+            //}
+
             NetworkReader reader = new NetworkReader(data);
             short msgType = reader.ReadShort();
             int callbackId = reader.ReadInt();

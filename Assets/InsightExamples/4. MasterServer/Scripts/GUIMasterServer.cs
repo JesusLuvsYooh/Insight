@@ -21,6 +21,7 @@ namespace Insight.Examples
         public Text userCountText;
         public Text playersInQueueCountText;
         public Text activeGamesText;
+        public Text connectionsText;
 
         bool Init;
 
@@ -45,6 +46,7 @@ namespace Insight.Examples
             gameCountText.text = gameModule.registeredGameServers.Count.ToString();
             userCountText.text = authModule.registeredUsers.Count.ToString();
             playersInQueueCountText.text = matchModule.playerQueue.Count.ToString();
+            connectionsText.text = InsightServer.instance.connections.Count.ToString();
 
             //Clear previous values
             activeGamesText.text = "";

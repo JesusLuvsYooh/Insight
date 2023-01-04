@@ -13,7 +13,7 @@ namespace Insight
         InsightServer server;
         InsightClient client;
 
-        public bool LogAll = true;
+        private bool NoisyLogs = false;
 
         [Header("Network")]
         [Tooltip("NetworkAddress that spawned processes will use")]
@@ -55,13 +55,19 @@ namespace Insight
             RegisterHandlers();
         }
 
-        void Awake()
+        // Switch to Start, so we can  make sure the server or client instance is alive first.
+        void Start()
         {
+            // all parts of insight use server or client script, so we will grab that data rather than having it duplicated
+            if ((InsightServer.instance && InsightServer.instance.NoisyLogs) || (InsightClient.instance && InsightClient.instance.NoisyLogs))
+            {
+                NoisyLogs = true;
+            }
             // Mac adjustments to make life easier
 #if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
             if (ProcessName.EndsWith(".exe"))
             {
-                if (LogAll)
+                if (NoisyLogs)
                     Debug.Log("[ProcessSpawner] - Switched file extension.");
                 ProcessName = ProcessName.Replace(".exe", ".app");
             }
@@ -72,7 +78,7 @@ namespace Insight
 
                 if (ProcessName.EndsWith(".app"))
                 {
-                    if (LogAll)
+                    if (NoisyLogs)
                         Debug.Log("[ProcessSpawner] - Auto adjust path for OSX");
                     ProcessName = ProcessName.Remove(ProcessName.Length - 4);
                 }
@@ -81,7 +87,7 @@ namespace Insight
             // Mac prefers not to use dot slash for same directory filepath
             if (ProcessPath == "./")
             {
-                if (LogAll)
+                if (NoisyLogs)
                     Debug.Log("[ProcessSpawner] - ProcessPath changed");
                 ProcessPath = "";
             }
@@ -95,7 +101,7 @@ namespace Insight
 
             if (System.IO.File.Exists(PathResult))
             {
-                if (LogAll)
+                if (NoisyLogs)
                     Debug.Log("[ProcessSpawner] - Path exists! " + PathResult);
             }
             else
@@ -105,6 +111,8 @@ namespace Insight
                 return;
             }
 
+            GatherCmdArgs();
+
             spawnerProcesses = new RunningProcessContainer[MaximumProcesses];
             for (int i = 0; i < spawnerProcesses.Length; i++)
             {
@@ -112,6 +120,51 @@ namespace Insight
             }
 
             InvokeRepeating("CheckSpawnedProcessHealth", HealthCheckPollRate, HealthCheckPollRate);
+        }
+
+        void GatherCmdArgs()
+        {
+            // check to see if we have args (we should for MasterServer and Spawners)
+            // Please note, Unity editor has its own args upon starting Play Mode.
+#if UNITY_EDITOR
+            if (NoisyLogs)
+                Debug.Log("[ProcessSpawner] Args - No overrides given, using default setup.");
+#else
+            string[] argsCheck = Environment.GetCommandLineArgs();
+            if (argsCheck == null || argsCheck.Length <= 1)
+            {
+                Debug.Log("[ProcessSpawner] Args - No overrides given, using default setup.");
+            }
+            else
+            {
+                InsightArgs args = new InsightArgs();
+                if (args.IsProvided("-NetworkAddress"))
+                {
+                    if (NoisyLogs)
+                        Debug.Log("[ProcessSpawner] Args - NetworkAddress: " + args.NetworkAddress);
+                    SpawnerNetworkAddress = args.NetworkAddress;
+                }
+                if (args.IsProvided("-NetworkPort"))
+                {
+                    if (NoisyLogs)
+                        Debug.Log("[ProcessSpawner] Args - NetworkPort: " + args.NetworkPort);
+                    StartingNetworkPort = args.NetworkPort;
+                }
+                if (args.IsProvided("-ProcessName"))
+                {
+                    if (NoisyLogs)
+                        Debug.Log("[ProcessSpawner] Args - ProcessName: " + args.ProcessName);
+                    ProcessName = args.ProcessName;
+                }
+                if (args.IsProvided("-ProcessesMax"))
+                {
+                    if (NoisyLogs)
+                        Debug.Log("[ProcessSpawner] Args - MaximumProcesses: " + args.ProcessesMax);
+                    MaximumProcesses = args.ProcessesMax;
+                }
+
+            }
+#endif
         }
 
         void FixedUpdate()
@@ -139,7 +192,7 @@ namespace Insight
         {
             if (AbortRun)
             {
-                if (LogAll)
+                if (NoisyLogs)
                     Debug.Log("[ProcessSpawner] - Abort HandleRequestSpawnStart");
                 return;
             }
@@ -170,8 +223,7 @@ namespace Insight
         {
             if (AbortRun)
             {
-                if (LogAll)
-                    Debug.Log("[ProcessSpawner] - Abort RegisterToMaster");
+                Debug.Log("[ProcessSpawner] - Abort RegisterToMaster");
                 return;
             }
 
@@ -180,7 +232,7 @@ namespace Insight
             {
                 if (client.isConnected)
                 {
-                    if (LogAll)
+                    if (NoisyLogs)
                         Debug.Log("[ProcessSpawner] - Registering to Master");
                     client.Send(new RegisterSpawnerMsg()
                     {
@@ -204,7 +256,7 @@ namespace Insight
 
                 if (spawnerProcesses[i].process.HasExited)
                 {
-                    if (LogAll)
+                    if (NoisyLogs)
                         Debug.Log("Removing process that has exited");
                     spawnerProcesses[i].process = null;
                     spawnerProcesses[i].pid = 0;
@@ -253,7 +305,7 @@ namespace Insight
             {
                 spawnProperties.UniqueID = Guid.NewGuid().ToString();
 
-                if (LogAll)
+                if (NoisyLogs)
                     Debug.Log("[ProcessSpawner] - UniqueID was not provided for spawn. Generating: " + spawnProperties.UniqueID);
             }
 
@@ -271,7 +323,7 @@ namespace Insight
 
             if (System.IO.File.Exists(p.StartInfo.FileName))
             {
-                if (LogAll)
+                if (NoisyLogs)
                     Debug.Log("[ProcessSpawner] - Path exists!" + p.StartInfo.FileName);
             }
             else
@@ -282,7 +334,7 @@ namespace Insight
 
             if (p.Start())
             {
-                if (LogAll)
+                if (NoisyLogs)
                     Debug.Log("[ProcessSpawner]: spawning: " + p.StartInfo.FileName + "; args=" + p.StartInfo.Arguments);
             }
             else
@@ -319,7 +371,7 @@ namespace Insight
                 }
             }
 
-            //if (LogAll) important to display, but do not flag as error
+            //if (NoisyLogs) important to display, but do not flag as error
             Debug.LogWarning("[ProcessSpawner] - Maximum Process Count Reached");
             return -1;
         }

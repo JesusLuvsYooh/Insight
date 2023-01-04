@@ -5,13 +5,13 @@ namespace Insight
 {
     public class ServerIdler : InsightModule
     {
-        public int MaxMinutesOfIdle;
+        public int MaxSecondsOfIdle = 60;
 
         public override void Initialize(InsightClient insight, ModuleManager manager)
         {
-            if (MaxMinutesOfIdle > 0)
+            if (MaxSecondsOfIdle > 0)
             {
-                InvokeRepeating("UpdateIdleState", MaxMinutesOfIdle * 60f, MaxMinutesOfIdle * 60f);
+                InvokeRepeating("UpdateIdleState", MaxSecondsOfIdle, MaxSecondsOfIdle);
             }
         }
 
