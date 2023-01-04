@@ -5,6 +5,10 @@ Assets/Mirror/
 Assets/Mirror/.meta
 Assets/Mirror.meta
 Builds
+Assets/Editor.meta
+Assets/Editor/ParrelSync*
+Assets/ScriptTemplates*
+*.DS_Store
 
 # =============== #
 # Unity generated #
