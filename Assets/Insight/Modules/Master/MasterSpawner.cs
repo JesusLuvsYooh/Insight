@@ -126,7 +126,7 @@ namespace Insight
 
             if (freeSlotSpawners.Count == 0)
             {
-                Debug.LogError("[MasterSpawner] - No Spawners with slots free available to service SpawnRequest.");
+                Debug.LogWarning("[MasterSpawner] - No Spawners with slots free available to service SpawnRequest.");
                 return;
             }
 

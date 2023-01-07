@@ -84,7 +84,7 @@ MonoBehaviour:
   DualMode: 1
   NoDelay: 1
   Interval: 10
-  Timeout: 10000
+  Timeout: 20000
   FastResend: 2
   CongestionWindow: 0
   SendWindowSize: 4096
@@ -140,7 +140,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8382b135107eaf5458d6471f839dc241, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LogAll: 1
   SpawnerNetworkAddress: localhost
   StartingNetworkPort: 7777
   allocatedPorts: 1

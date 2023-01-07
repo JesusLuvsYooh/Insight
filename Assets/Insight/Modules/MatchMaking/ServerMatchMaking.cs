@@ -79,7 +79,8 @@ namespace Insight
             {
                 if (masterSpawner.registeredSpawners.Count == 0 || gameManager.registeredGameServers.Count == 0)
                 {
-                    Debug.LogWarning("[MatchMaking] - No spawners or servers, queuing player.");
+                    //if (InsightServer.instance.NoisyLogs)
+                        Debug.Log("[MatchMaking] - No spawners or servers, queuing player.");
                     playerQueue.Add(authModule.GetUserByConnection(netMsg.connectionId));
                 }
                 else
@@ -98,18 +99,21 @@ namespace Insight
                 if (gameTemp.CurrentPlayers < gameTemp.MaxPlayers)
                 {
                     game = gameTemp;
-                    Debug.LogWarning("[MatchMaking] - Game with space found." + game.connectionId);
+                    if (InsightServer.instance.NoisyLogs)
+                        Debug.Log("[MatchMaking] - Game with space found.");
                 }
             };
 
             if (game == null)
             {
-                Debug.LogWarning("[MatchMaking] - No spaces queue player.");
+                //if (InsightServer.instance.NoisyLogs)
+                    Debug.Log("[MatchMaking] - No spaces queue player.");
                 playerQueue.Add(authModule.GetUserByConnection(netMsg.connectionId));
             }
             else
             {
-                Debug.LogWarning("[MatchMaking] - Sending client to server.");
+                if (InsightServer.instance.NoisyLogs)
+                    Debug.Log("[MatchMaking] - Sending client to server.");
 
                 netMsg.Reply(new ChangeServerMsg()
                 {
@@ -159,8 +163,12 @@ namespace Insight
         {
             if (playerQueue.Count < MinimumPlayersForGame)
             {
-                if (InsightServer.instance.NoisyLogs)
-                    Debug.Log("[MatchMaking] - Minimum players in queue not reached.");
+                // to stop log spam
+                if (MinimumPlayersForGame > 1)
+                {
+                    if (InsightServer.instance.NoisyLogs)
+                        Debug.Log("[MatchMaking] - Minimum players in queue not reached.");
+                }
                 return;
             }
 
@@ -294,7 +302,8 @@ namespace Insight
                     CancelMatch();
                 }
 
-                Debug.LogWarning("Server not active at this time");
+                if (InsightServer.instance.NoisyLogs)
+                    Debug.LogWarning("Server not active at this time");
                 return false;
             }
             return true;

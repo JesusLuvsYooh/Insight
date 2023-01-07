@@ -144,7 +144,8 @@ namespace Insight
 
             if (GetActiveInsight().UnpackMessage(reader, out int msgType))
             {
-                Debug.Log("ConnectionRecv " + this + " msgType:" + msgType + " content:" + BitConverter.ToString(data.Array, data.Offset, data.Count));
+                if (InsightServer.instance.NoisyLogs)
+                    Debug.Log("ConnectionRecv " + this + " msgType:" + msgType + " content:" + BitConverter.ToString(data.Array, data.Offset, data.Count));
                 int callbackId = reader.ReadInt();
                 // try to invoke the handler for that message
                 InsightNetworkMessageDelegate msgDelegate;

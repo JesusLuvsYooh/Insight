@@ -38,7 +38,8 @@ namespace Insight
         {
             RegisterGameMsg message = netMsg.ReadMessage<RegisterGameMsg>();
 
-            Debug.Log("[GameManager] - Received GameRegistration request");
+            if (InsightServer.instance.NoisyLogs)
+                Debug.Log("[GameManager] - Received GameRegistration request");
 
             registeredGameServers.Add(new GameContainer()
             {
@@ -57,7 +58,8 @@ namespace Insight
         {
             GameStatusMsg message = netMsg.ReadMessage<GameStatusMsg>();
 
-            Debug.Log("[GameManager] - Received Game status update");
+            if (InsightServer.instance.NoisyLogs)
+                Debug.Log("[GameManager] - Received Game status update");
 
             foreach (GameContainer game in registeredGameServers)
             {

@@ -91,11 +91,11 @@ namespace Insight
 
         void HandleConnect(int connectionId)
         {
-            Debug.LogWarning("connectionId: " + connectionId);
-            if (serverID == 0)
-            {
-                serverID = connectionId;
-            }
+                //Debug.LogWarning("connectionId: " + connectionId);
+            //if (serverID == 0)
+            //{
+            //    serverID = connectionId;
+            //}
             // cant remember what this was for?
             //if (connectionId != serverID)
             //{
@@ -142,7 +142,7 @@ namespace Insight
             }
         }
 
-        int serverID = 0;
+       // int serverID = 0;
 
         void HandleData(int connectionId, ArraySegment<byte> data, int i)
         {

@@ -204,10 +204,9 @@ namespace Insight
         void SendGameStatusToGameManager()
         {
             //Update with current values from NetworkManager:
-            CurrentPlayers = NetworkManager.singleton.numPlayers;
-            //CurrentPlayers = NetworkServer.connections.Count;
-
-            Debug.Log("[GameRegistration] Count: " + NetworkServer.connections.Count + " - NP:" + NetworkManager.singleton.numPlayers);
+            //CurrentPlayers = NetworkManager.singleton.numPlayers;
+            // Chosing to use connections count, as it includes any connections joining, leaving, or stuck in limbo.
+            CurrentPlayers = NetworkServer.connections.Count;
 
             if (InsightClient.instance.NoisyLogs)
                 Debug.Log("[GameRegistration] - status update");
@@ -222,9 +221,9 @@ namespace Insight
 
         private void Update()
         {
-            if (tempNumPlayers != NetworkManager.singleton.numPlayers)
+            if (tempNumPlayers != NetworkServer.connections.Count)
             {
-                tempNumPlayers = NetworkManager.singleton.numPlayers;
+                tempNumPlayers = NetworkServer.connections.Count;
                 Debug.Log("[Game Registration] NumPlayers changed: " + tempNumPlayers);
                 SendGameStatusToGameManager();
             }

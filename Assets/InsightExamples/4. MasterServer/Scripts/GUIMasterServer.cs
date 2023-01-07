@@ -24,6 +24,8 @@ namespace Insight.Examples
         public Text connectionsText;
 
         bool Init;
+        private string previousActiveGamesText = "";
+        private string currentActiveGamesText = "";
 
         void FixedUpdate()
         {
@@ -50,11 +52,20 @@ namespace Insight.Examples
 
             //Clear previous values
             activeGamesText.text = "";
+            currentActiveGamesText = "";
 
             //Game Status
             foreach (GameContainer game in gameModule.registeredGameServers)
             {
                 activeGamesText.text += game.UniqueId + " - " + game.NetworkAddress + ":" + game.NetworkPort + " - " + game.SceneName + " - " + game.CurrentPlayers + "/" + game.MaxPlayers + Environment.NewLine;
+                currentActiveGamesText += game.NetworkAddress + ":" + game.NetworkPort + " - " + game.SceneName + " - " + game.CurrentPlayers + "/" + game.MaxPlayers + Environment.NewLine;
+            }
+
+            if (previousActiveGamesText != currentActiveGamesText)
+            {
+                previousActiveGamesText = currentActiveGamesText;
+                if (currentActiveGamesText != "")
+                { print(currentActiveGamesText); }
             }
         }
     }

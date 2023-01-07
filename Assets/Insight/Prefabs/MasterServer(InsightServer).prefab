@@ -176,6 +176,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinimumPlayersForGame: 1
   MatchMakingPollRate: 10
+  AllowJoiningOfGamesInProgress: 0
   playerQueue: []
   matchList: []
 --- !u!1 &1960458110905104
@@ -277,7 +278,7 @@ MonoBehaviour:
   DualMode: 1
   NoDelay: 1
   Interval: 10
-  Timeout: 10000
+  Timeout: 20000
   FastResend: 2
   CongestionWindow: 0
   SendWindowSize: 4096

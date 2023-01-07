@@ -11,14 +11,16 @@ namespace Insight
         {
             if (MaxSecondsOfIdle > 0)
             {
+                CancelInvoke();
                 InvokeRepeating("UpdateIdleState", MaxSecondsOfIdle, MaxSecondsOfIdle);
             }
         }
 
         void UpdateIdleState()
         {
+            print("UpdateIdleState");
             //Cancel if players connect to the game.
-            if(NetworkManager.singleton.numPlayers == 0)
+            if (NetworkManager.singleton.numPlayers == 0)
             {
                 Debug.LogWarning("[ServerIdler] - No players connected within the allowed time. Shutting down server");
 
@@ -28,6 +30,17 @@ namespace Insight
             }
 
             CancelInvoke();
+        }
+
+        private void Start()
+        {
+            // Rare cases "Initialize" is not being called, or was cancelled, resulting in GameServers not shutting down if 0 players
+            // Dirty fix to check for that rare case
+            if (MaxSecondsOfIdle > 0)
+            {
+                CancelInvoke();
+                InvokeRepeating("UpdateIdleState", MaxSecondsOfIdle, MaxSecondsOfIdle);
+            }
         }
     }
 }
