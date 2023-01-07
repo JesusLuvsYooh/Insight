@@ -45,7 +45,7 @@ namespace Insight
             NetworkManager.singleton.networkAddress = message.NetworkAddress;
 
             NetworkManager.singleton.StartClient();
-            SceneManager.LoadScene(message.SceneName);
+            //SceneManager.LoadScene(message.SceneName);
         }
 
         void SetPort(Transport transport, ushort port) {

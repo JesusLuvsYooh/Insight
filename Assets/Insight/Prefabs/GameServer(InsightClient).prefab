@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 114092492723764628}
   - component: {fileID: 5718592856820291868}
   - component: {fileID: 3454945445600430076}
+  - component: {fileID: 5997459328113258415}
   m_Layer: 0
   m_Name: GameServer(InsightClient)
   m_TagString: Untagged
@@ -112,6 +113,25 @@ MonoBehaviour:
   debugLog: 0
   statisticsGUI: 0
   statisticsLog: 0
+--- !u!114 &5997459328113258415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1763708289631472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a71d54f725cc40d8acd32a334e9dcde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  toggleKey: 96
+  openOnStart: 0
+  shakeToOpen: 1
+  shakeAcceleration: 3
+  restrictLogCount: 0
+  maxLogCount: 1000
+  autoGenerateHTML: 0
 --- !u!1 &1802009185712394
 GameObject:
   m_ObjectHideFlags: 0
@@ -205,4 +225,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcf7450b2b35ad949a5b27a12ab00aed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxMinutesOfIdle: 5
+  MaxSecondsOfIdle: 60

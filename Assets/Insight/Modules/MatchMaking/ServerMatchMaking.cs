@@ -18,6 +18,7 @@ namespace Insight
 
         public int MinimumPlayersForGame = 1;
         public float MatchMakingPollRate = 10f;
+        public bool AllowJoiningOfGamesInProgress = false;
 
         public List<UserContainer> playerQueue = new List<UserContainer>();
         public List<MatchContainer> matchList = new List<MatchContainer>();
@@ -67,7 +68,56 @@ namespace Insight
             optionalClientMatchmakingData = netMsg.ReadMessage<StartMatchMakingMsg>().SceneName;
             if (InsightServer.instance.NoisyLogs)
                 Debug.Log("[MatchMaking] - Client data received: " + optionalClientMatchmakingData);
-            playerQueue.Add(authModule.GetUserByConnection(netMsg.connectionId));
+
+
+            // temp check, needs to cycle through all spawners and gameservers
+            if (AllowJoiningOfGamesInProgress == false)
+            {
+                playerQueue.Add(authModule.GetUserByConnection(netMsg.connectionId));
+            }
+            else
+            {
+                if (masterSpawner.registeredSpawners.Count == 0 || gameManager.registeredGameServers.Count == 0)
+                {
+                    Debug.LogWarning("[MatchMaking] - No spawners or servers, queuing player.");
+                    playerQueue.Add(authModule.GetUserByConnection(netMsg.connectionId));
+                }
+                else
+                {
+                    SearchForServerSpaces(netMsg);
+                }
+            }
+        }
+
+        void SearchForServerSpaces(InsightNetworkMessage netMsg)
+        {
+            GameContainer game = null;
+
+            foreach (GameContainer gameTemp in gameManager.registeredGameServers)
+            {
+                if (gameTemp.CurrentPlayers < gameTemp.MaxPlayers)
+                {
+                    game = gameTemp;
+                    Debug.LogWarning("[MatchMaking] - Game with space found." + game.connectionId);
+                }
+            };
+
+            if (game == null)
+            {
+                Debug.LogWarning("[MatchMaking] - No spaces queue player.");
+                playerQueue.Add(authModule.GetUserByConnection(netMsg.connectionId));
+            }
+            else
+            {
+                Debug.LogWarning("[MatchMaking] - Sending client to server.");
+
+                netMsg.Reply(new ChangeServerMsg()
+                {
+                    NetworkAddress = game.NetworkAddress,
+                    NetworkPort = game.NetworkPort,
+                    SceneName = game.SceneName
+                });
+            }
         }
 
         void HandleStopMatchSearchMsg(InsightNetworkMessage netMsg)

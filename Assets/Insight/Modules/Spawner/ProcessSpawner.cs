@@ -72,9 +72,17 @@ namespace Insight
                 ProcessName = ProcessName.Replace(".exe", ".app");
             }
 
-            if (!ProcessName.Contains("/Contents/MacOS/"))
+            // Mac prefers not to use dot slash for same directory filepath
+            //if (ProcessPath.Contains(".\"))
+            //{
+            if (NoisyLogs)
+                Debug.Log("[ProcessSpawner] - ProcessPath changed");
+            ProcessPath = "";
+        //}
+
+            if (!ProcessPath.Contains("/Contents/MacOS/"))
             {
-                ProcessName = ProcessName + "/Contents/MacOS/" + ProcessName;
+                ProcessPath += ProcessName + "/Contents/MacOS/";
 
                 if (ProcessName.EndsWith(".app"))
                 {
@@ -84,13 +92,7 @@ namespace Insight
                 }
             }
 
-            // Mac prefers not to use dot slash for same directory filepath
-            if (ProcessPath == "./")
-            {
-                if (NoisyLogs)
-                    Debug.Log("[ProcessSpawner] - ProcessPath changed");
-                ProcessPath = "";
-            }
+            
 #endif
 
 #if UNITY_EDITOR

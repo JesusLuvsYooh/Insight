@@ -81,6 +81,8 @@ namespace Insight.Examples
 
         public void FixedUpdate()
         {
+            if (chatComp == null)
+                return;
             //This is gross. Needs a better design that does not introduce coupling.
             chatTextField.text = chatComp.chatLog;
         }
@@ -119,6 +121,20 @@ namespace Insight.Examples
             StopMatchMakingButton.SetActive(true);
 
             matchComp.SendStartMatchMaking(new StartMatchMakingMsg() { SceneName = GameName });
+        }
+
+        public void SetSceneMakingButton(int _value)
+        {
+            if (_value == 1)
+            {
+                GameName = "MyScene";
+            }
+            else
+            {
+                GameName = "MyScene2";
+            }
+
+            HandleStartMatchMakingButton();
         }
 
         public void HandleStopMatchMakingButton()

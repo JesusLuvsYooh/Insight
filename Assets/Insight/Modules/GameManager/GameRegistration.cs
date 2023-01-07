@@ -1,5 +1,6 @@
 ﻿using Mirror;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
 namespace Insight
@@ -29,7 +30,13 @@ namespace Insight
             client = insight;
             client.transport.OnClientConnected += SendGameRegistrationToGameManager;
 
+            //NetworkManager.singleton.OnServerDisconnect = OnServerDisconnect;
+            //NetworkManager.singleton.OnServerAddPlayer = OnServerAddPlayer;
+
             networkManagerTransport = Transport.activeTransport;
+
+            //networkManagerTransport.OnServerDisconnected = OnServerDisconnect;
+            //networkManagerTransport.OnServerConnected = OnServerCconnected;
 
             RegisterHandlers();
             GatherCmdArgs();
@@ -39,7 +46,35 @@ namespace Insight
                 Debug.LogError("Registration aborted.");
                 return;
             }
-            InvokeRepeating("SendGameStatusToGameManager", 30f, 30f);
+            //Changed to use a Number of Players changed check, rather than timed loop.
+            //InvokeRepeating("SendGameStatusToGameManager", 30f, 30f);
+        }
+
+        //void OnServerDisconnect(int value)
+        //{
+        //    Debug.Log("[Game Registration] OnServerDisconnect." + value);
+        //    SendGameStatusToGameManager();
+        //}
+
+        //void OnServerCconnected(int value)
+        //{
+        //    Debug.Log("[Game Registration] OnServerConnected." + value);
+        //    SendGameStatusToGameManager();
+        //}
+
+        int _theVariable;
+
+        public int TheVariable
+        {
+            get { return _theVariable; }
+            set
+            {
+                _theVariable = value;
+                if (_theVariable == 1)
+                {
+                    //Do stuff here.
+                }
+            }
         }
 
         void RegisterHandlers() { }
@@ -117,10 +152,10 @@ namespace Insight
             {
                 if (InsightClient.instance.NoisyLogs)
                     Debug.Log("[Args] - UniqueID: " + args.UniqueID);
-        UniqueID = args.UniqueID;
+                UniqueID = args.UniqueID;
             }
 
-    MaxPlayers = NetworkManager.singleton.maxConnections;
+            MaxPlayers = NetworkManager.singleton.maxConnections;
 
             if (AbortRun == true)
             {
@@ -129,55 +164,70 @@ namespace Insight
                 //Application.Quit();
             }
             else
-{
-    //Start NetworkManager
-    NetworkManager.singleton.StartServer();
-}
+            {
+                //Start NetworkManager
+                NetworkManager.singleton.StartServer();
+            }
         }
 
         void SetPort(Transport transport, ushort port)
-{
-    if (transport.GetType().GetField("port") != null)
-    {
-        transport.GetType().GetField("port").SetValue(transport, port);
-    }
-    else if (transport.GetType().GetField("Port") != null)
-    {
-        transport.GetType().GetField("Port").SetValue(transport, port);
-    }
-    else if (transport.GetType().GetField("CommunicationPort") != null)
-    {//For Ignorance
-        transport.GetType().GetField("CommunicationPort").SetValue(transport, port);
-    }
-}
+        {
+            if (transport.GetType().GetField("port") != null)
+            {
+                transport.GetType().GetField("port").SetValue(transport, port);
+            }
+            else if (transport.GetType().GetField("Port") != null)
+            {
+                transport.GetType().GetField("Port").SetValue(transport, port);
+            }
+            else if (transport.GetType().GetField("CommunicationPort") != null)
+            {//For Ignorance
+                transport.GetType().GetField("CommunicationPort").SetValue(transport, port);
+            }
+        }
 
-void SendGameRegistrationToGameManager()
-{
-    if (InsightClient.instance.NoisyLogs)
-        Debug.Log("[GameRegistration] - registering with master");
-    client.Send(new RegisterGameMsg()
-    {
-        NetworkAddress = NetworkAddress,
-        NetworkPort = NetworkPort,
-        UniqueID = UniqueID,
-        SceneName = GameScene,
-        MaxPlayers = MaxPlayers,
-        CurrentPlayers = CurrentPlayers
-    });
-}
+        void SendGameRegistrationToGameManager()
+        {
+            if (InsightClient.instance.NoisyLogs)
+                Debug.Log("[GameRegistration] - registering with master");
+            client.Send(new RegisterGameMsg()
+            {
+                NetworkAddress = NetworkAddress,
+                NetworkPort = NetworkPort,
+                UniqueID = UniqueID,
+                SceneName = GameScene,
+                MaxPlayers = MaxPlayers,
+                CurrentPlayers = CurrentPlayers
+            });
+        }
 
-void SendGameStatusToGameManager()
-{
-    //Update with current values from NetworkManager:
-    CurrentPlayers = NetworkManager.singleton.numPlayers;
+        void SendGameStatusToGameManager()
+        {
+            //Update with current values from NetworkManager:
+            CurrentPlayers = NetworkManager.singleton.numPlayers;
+            //CurrentPlayers = NetworkServer.connections.Count;
 
-    if (InsightClient.instance.NoisyLogs)
-        Debug.Log("[GameRegistration] - status update");
-    client.Send(new GameStatusMsg()
-    {
-        UniqueID = UniqueID,
-        CurrentPlayers = CurrentPlayers
-    });
-}
+            Debug.Log("[GameRegistration] Count: " + NetworkServer.connections.Count + " - NP:" + NetworkManager.singleton.numPlayers);
+
+            if (InsightClient.instance.NoisyLogs)
+                Debug.Log("[GameRegistration] - status update");
+            client.Send(new GameStatusMsg()
+            {
+                UniqueID = UniqueID,
+                CurrentPlayers = CurrentPlayers
+            });
+        }
+
+        private int tempNumPlayers = 0;
+
+        private void Update()
+        {
+            if (tempNumPlayers != NetworkManager.singleton.numPlayers)
+            {
+                tempNumPlayers = NetworkManager.singleton.numPlayers;
+                Debug.Log("[Game Registration] NumPlayers changed: " + tempNumPlayers);
+                SendGameStatusToGameManager();
+            }
+        }
     }
 }
