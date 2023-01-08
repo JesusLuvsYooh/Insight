@@ -370,6 +370,75 @@ MonoBehaviour:
   debugLog: 0
   statisticsGUI: 0
   statisticsLog: 0
+--- !u!1001 &1272022776
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5137368713389648390, guid: 3a5a0b5e3fdf94e0ca9e368111ef05bb,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5137368713389648390, guid: 3a5a0b5e3fdf94e0ca9e368111ef05bb,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 560.80164
+      objectReference: {fileID: 0}
+    - target: {fileID: 5137368713389648390, guid: 3a5a0b5e3fdf94e0ca9e368111ef05bb,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 938.89
+      objectReference: {fileID: 0}
+    - target: {fileID: 5137368713389648390, guid: 3a5a0b5e3fdf94e0ca9e368111ef05bb,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5137368713389648390, guid: 3a5a0b5e3fdf94e0ca9e368111ef05bb,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5137368713389648390, guid: 3a5a0b5e3fdf94e0ca9e368111ef05bb,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5137368713389648390, guid: 3a5a0b5e3fdf94e0ca9e368111ef05bb,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5137368713389648390, guid: 3a5a0b5e3fdf94e0ca9e368111ef05bb,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5137368713389648390, guid: 3a5a0b5e3fdf94e0ca9e368111ef05bb,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5137368713389648390, guid: 3a5a0b5e3fdf94e0ca9e368111ef05bb,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5137368713389648390, guid: 3a5a0b5e3fdf94e0ca9e368111ef05bb,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8636630449215351247, guid: 3a5a0b5e3fdf94e0ca9e368111ef05bb,
+        type: 3}
+      propertyPath: m_Name
+      value: Console
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3a5a0b5e3fdf94e0ca9e368111ef05bb, type: 3}
 --- !u!1 &1548208519
 GameObject:
   m_ObjectHideFlags: 0

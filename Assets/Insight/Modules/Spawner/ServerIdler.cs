@@ -18,28 +18,17 @@ namespace Insight
 
         void UpdateIdleState()
         {
-            print("UpdateIdleState");
-            //Cancel if players connect to the game.
             if (NetworkManager.singleton.numPlayers == 0)
             {
+                // Moved CancelInvoke here, as we want to close dead GameServers, even after a players joined
+                // Previously if players joined, then left, it would no longer be running the invoke and close if 0 players
+                CancelInvoke();
+
                 Debug.LogWarning("[ServerIdler] - No players connected within the allowed time. Shutting down server");
 
                 NetworkManager.singleton.StopServer();
 
                 Application.Quit();
-            }
-
-            CancelInvoke();
-        }
-
-        private void Start()
-        {
-            // Rare cases "Initialize" is not being called, or was cancelled, resulting in GameServers not shutting down if 0 players
-            // Dirty fix to check for that rare case
-            if (MaxSecondsOfIdle > 0)
-            {
-                CancelInvoke();
-                InvokeRepeating("UpdateIdleState", MaxSecondsOfIdle, MaxSecondsOfIdle);
             }
         }
     }

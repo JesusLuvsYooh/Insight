@@ -19,9 +19,10 @@ namespace Consolation
     /// </summary>
     class Console : MonoBehaviour
     {
+#if !UNITY_SERVER
         public static Version version = new Version(1, 0, 0);
 
-        #region Inspector Settings
+#region Inspector Settings
 
         /// <summary>
         /// The hotkey to show and hide the console window.
@@ -58,7 +59,7 @@ namespace Consolation
         /// </summary>
         public bool autoGenerateHTML = false;
 
-        #endregion
+#endregion
 
         static readonly GUIContent clearLabel = new GUIContent("Clear", "Clear the contents of the console.");
         static readonly GUIContent collapseLabel = new GUIContent("Collapse", "Hide repeated messages.");
@@ -93,7 +94,7 @@ namespace Consolation
             { LogType.Warning, true },
         };
 
-        #region MonoBehaviour Messages
+#region MonoBehaviour Messages
 
         void OnDisable()
         {
@@ -143,7 +144,7 @@ namespace Consolation
             }
         }
 
-        #endregion
+#endregion
 
         void DrawCollapsedLog(Log log)
         {
@@ -443,5 +444,6 @@ namespace Consolation
                 return true;
             }
         }
+#endif
     }
 }
