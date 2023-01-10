@@ -52,6 +52,16 @@ namespace Insight
 
                 connectionId = netMsg.connectionId,
             });
+
+            if (server.autoAuthClients)
+            {
+                InsightNetworkConnection conn;
+                if (server.connections.TryGetValue(netMsg.connectionId, out conn))
+                {
+                    server.serverAuthentication.registeredUsers.Remove(server.serverAuthentication.GetUserByConnection(netMsg.connectionId));
+                    Debug.Log("[GameManager] - Removed GameServer from player list.");
+                }
+            }
         }
 
         void HandleGameStatusMsg(InsightNetworkMessage netMsg)

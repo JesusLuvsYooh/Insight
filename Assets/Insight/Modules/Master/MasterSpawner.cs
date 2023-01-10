@@ -53,6 +53,17 @@ namespace Insight
             });
 
             Debug.Log("[MasterSpawner] - New Process Spawner Regsitered");
+
+
+            if (server.autoAuthClients)
+            {
+                InsightNetworkConnection conn;
+                if (server.connections.TryGetValue(netMsg.connectionId, out conn))
+                {
+                    server.serverAuthentication.registeredUsers.Remove(server.serverAuthentication.GetUserByConnection(netMsg.connectionId));
+                    Debug.Log("[MasterSpawner] - Removed Spawner from player list.");
+                }
+            }
         }
 
         //Instead of handling the msg here we will forward it to an available spawner.

@@ -28,7 +28,7 @@ namespace Insight
 
         void RegisterHandlers()
         {
-
+            client.RegisterHandler<LoginResponseMsg>(HandleLoginMsg);
         }
 
         public void SendLoginMsg()
@@ -58,6 +58,27 @@ namespace Insight
         {
             userName = username;
             userPassword = password;
+        }
+
+        void HandleLoginMsg(InsightNetworkMessage netMsg)
+        {
+            LoginResponseMsg msg = netMsg.ReadMessage<LoginResponseMsg>();
+
+            if (msg.Status == CallbackStatus.Success)
+            {
+                uniqueID = msg.UniqueID;
+                loginSucessful = true;
+                loginResponse = "Login Successful!";
+                Debug.Log("[ClientAuthentication] - Login Successful!");
+            }
+            else if (msg.Status == CallbackStatus.Error)
+            {
+                Debug.LogError("[ClientAuthentication] - Callback Error: Login error");
+            }
+            else if (msg.Status == CallbackStatus.Timeout)
+            {
+                Debug.LogError("[ClientAuthentication] - Callback Error: Login attempt timed out");
+            }
         }
     }
 }

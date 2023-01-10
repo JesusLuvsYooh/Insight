@@ -8,9 +8,9 @@ namespace Insight
     {
         public static InsightClient instance;
 
-        [Tooltip("-Optional experimental false setting-\nStay connected to Master Server upon joining Game Server, this is required for certain features like cross-server chat.\nFalse will lighten the Master Server load, using fewer resources and allowing more connections.")]
-        public bool StayConnected = true;
-        public bool AutoReconnect = true;
+       // [Tooltip("-Optional experimental false setting-\nStay connected to Master Server upon joining Game Server, this is required for certain features like cross-server chat.\nFalse will lighten the Master Server load, using fewer resources and allowing more connections.")]
+       // public bool StayConnected = true;
+        //public bool AutoReconnect = true;
         public bool AuthClientUponConnect = false;
         [Tooltip("Set false to log only warnings and errors, ideal for release build.")]
         public bool NoisyLogs = true;
@@ -132,15 +132,15 @@ namespace Insight
 
         private void CheckConnection()
         {
-            if (AutoReconnect)
-            {
+            //if (AutoReconnect)
+            //{
                 if (active && !isConnected && (_reconnectTimer > 0 && _reconnectTimer < Time.time))
                 {
                     if(NoisyLogs) Debug.Log("[InsightClient] - Trying to reconnect...");
                     _reconnectTimer = Time.realtimeSinceStartup + ReconnectDelayInSeconds;
                     StartInsight();
                 }
-            }
+           // }
         }
 
         public void Send(byte[] data)
@@ -265,6 +265,7 @@ namespace Insight
                 Debug.Log("[InsightClient] - Disconnecting from Insight Server");
         }
 
+        /*
         public void TemporarilyDisconnectFromInsightServer()
         {
             if (StayConnected == false)
@@ -286,5 +287,6 @@ namespace Insight
                 StartInsight();
             }
         }
+        */
     }
 }

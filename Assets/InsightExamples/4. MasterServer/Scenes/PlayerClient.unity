@@ -1861,7 +1861,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1115168650}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b3dad880bea40495691ed0f29fd4d225, type: 3}
+  m_Script: {fileID: 11500000, guid: 8aab4c8111b7c411b9b92cf3dbc5bd4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 1
@@ -4225,6 +4225,11 @@ PrefabInstance:
         type: 3}
       propertyPath: StayConnected
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 977220133108369793, guid: 936345dc85da8084b8903c7474dc155c,
+        type: 3}
+      propertyPath: AuthClientUponConnect
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 977220133108369795, guid: 936345dc85da8084b8903c7474dc155c,
         type: 3}

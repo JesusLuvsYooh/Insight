@@ -11,7 +11,10 @@ namespace Insight
 
         [Tooltip("Set false to log only warnings and errors, ideal for release build.")]
         public bool NoisyLogs = true;
+        [Tooltip("Auto call login.auth upon clients connecting to MasterServer.")]
         public bool autoAuthClients = false;
+        [Tooltip("This is required for certain features like cross-server chat.\nHowever False will lighten the Master Server load, using fewer resources and allowing more connections.")]
+        public bool PlayerStayConnectedToMasterServer = true;
         protected int serverHostId = -1; //-1 = never connected, 0 = disconnected, 1 = connected
         public Dictionary<int, InsightNetworkConnection> connections = new Dictionary<int, InsightNetworkConnection>();
         protected List<SendToAllFinishedCallbackData> sendToAllFinishedCallbacks = new List<SendToAllFinishedCallbackData>();
@@ -89,7 +92,7 @@ namespace Insight
 
         
 
-        void HandleConnect(int connectionId)
+        void HandleConnect(int _connectionId)
         {
                 //Debug.LogWarning("connectionId: " + connectionId);
             //if (serverID == 0)
@@ -104,29 +107,70 @@ namespace Insight
             //}
 
             if (NoisyLogs)
-                Debug.Log("[InsightServer] - Client connected connectionID: " + connectionId, this);
+                Debug.Log("[InsightServer] - Client connected connectionID: " + _connectionId, this);
 
             // get ip address from connection
-            string address = GetConnectionInfo(connectionId);
+            string address = GetConnectionInfo(_connectionId);
 
             // add player info
             InsightNetworkConnection conn = new InsightNetworkConnection();
-            conn.Initialize(this, address, serverHostId, connectionId);
+            conn.Initialize(this, address, serverHostId, _connectionId);
             AddConnection(conn);
 
             //check ban list for matching address
             //    if true
             //        {
-                   // HandleDisconnect(connectionId);
-              //  }
+            // HandleDisconnect(connectionId);
+            //  }
 
-           // string UniqueId = Guid.NewGuid().ToString();
-           //serverAuthentication.registeredUsers.Add(new UserContainer()
-           //{
-           //    username = "",
-           //    uniqueId = UniqueId,
-           //    connectionId = connectionId
-           //});
+            // string UniqueId = Guid.NewGuid().ToString();
+            //serverAuthentication.registeredUsers.Add(new UserContainer()
+            //{
+            //    username = "",
+            //    uniqueId = UniqueId,
+            //    connectionId = connectionId
+            //});
+
+            if (autoAuthClients)
+            {
+                if (connections.Count <= 0 )// == _connectionId)
+                {
+                    if (NoisyLogs)
+                        Debug.Log("[InsightServer] - autoAuthClients, do not add MS as client.");
+                    return;
+                }
+
+                if (NoisyLogs)
+                    Debug.Log("[InsightServer] - autoAuthClients: " + _connectionId);
+
+                if (serverAuthentication.GetUserByConnection(_connectionId) != null)
+                {
+                    if (NoisyLogs)
+                        Debug.Log("[InsightServer] - autoAuthClients exists: " + _connectionId);
+                }
+                else
+                {
+                    if (NoisyLogs)
+                        Debug.Log("[InsightServer] - autoAuthClients does not exist, adding: " + _connectionId);
+
+                        string UniqueId = Guid.NewGuid().ToString();
+
+                    serverAuthentication.registeredUsers.Add(new UserContainer()
+                    {
+                        username = "",
+                        uniqueId = UniqueId,
+                        connectionId = _connectionId
+                    });
+
+                    SendToClient(_connectionId, new LoginResponseMsg()
+                    {
+                        UniqueID = UniqueId,
+                        Status = CallbackStatus.Success
+                    }); ;
+                }
+               
+            }
+            
         }
 
         void HandleDisconnect(int connectionId)
@@ -139,6 +183,7 @@ namespace Insight
             {
                 conn.Disconnect();
                 RemoveConnection(connectionId);
+                serverAuthentication.registeredUsers.Remove(serverAuthentication.GetUserByConnection(connectionId));
             }
         }
 

@@ -224,7 +224,8 @@ namespace Insight
             if (tempNumPlayers != NetworkServer.connections.Count)
             {
                 tempNumPlayers = NetworkServer.connections.Count;
-                Debug.Log("[Game Registration] NumPlayers changed: " + tempNumPlayers);
+                if (InsightClient.instance.NoisyLogs)
+                    Debug.Log("[Game Registration] NumPlayers changed: " + tempNumPlayers);
                 SendGameStatusToGameManager();
             }
         }

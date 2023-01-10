@@ -26,7 +26,7 @@ namespace Insight
         bool _spawnInProgress;
 
         private string optionalClientMatchmakingData = "SuperAwesomeGame";
-
+        
         public void Awake()
         {
             AddDependency<MasterSpawner>();
@@ -121,6 +121,12 @@ namespace Insight
                     NetworkPort = game.NetworkPort,
                     SceneName = game.SceneName
                 });
+
+                if (InsightServer.instance.PlayerStayConnectedToMasterServer == false)
+                {
+                    authModule.registeredUsers.Remove(authModule.GetUserByConnection(netMsg.connectionId));
+                    NetworkServer.RemoveConnection(netMsg.connectionId);
+                }
             }
         }
 
@@ -208,6 +214,11 @@ namespace Insight
             {
                 matchUsers.Add(playerQueue[i]);
                 playerQueue.RemoveAt(i);
+                if (InsightServer.instance.PlayerStayConnectedToMasterServer == false)
+                {
+                    authModule.registeredUsers.Remove(authModule.GetUserByConnection(playerQueue[i].connectionId));
+                    NetworkServer.RemoveConnection(playerQueue[i].connectionId);
+                }
             }
 
             matchList.Add(new MatchContainer(this, requestSpawnStart, matchUsers));

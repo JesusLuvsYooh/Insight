@@ -246,6 +246,21 @@ PrefabInstance:
       propertyPath: NoisyLogs
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114111681706678862, guid: e28689e5cfcf647ae9f75ac10bff424d,
+        type: 3}
+      propertyPath: autoAuthClients
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114111681706678862, guid: e28689e5cfcf647ae9f75ac10bff424d,
+        type: 3}
+      propertyPath: PlayerStayConnectedToMasterServer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114810829956139598, guid: e28689e5cfcf647ae9f75ac10bff424d,
+        type: 3}
+      propertyPath: StayConnected
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 114810829956139598, guid: e28689e5cfcf647ae9f75ac10bff424d,
         type: 3}
       propertyPath: AllowJoiningOfGamesInProgress
