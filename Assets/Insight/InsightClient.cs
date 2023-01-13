@@ -222,10 +222,18 @@ namespace Insight
             }
         }
 
+#if MIRROR_71_0_OR_NEWER
         void OnError(TransportError error, string reason)
+#else
+        void OnError(Exception exception)
+#endif
         {
             // TODO Let's discuss how we will handle errors
+#if MIRROR_71_0_OR_NEWER
             Debug.LogWarning($"Client Transport Error: {error}: {reason}");
+#else
+            Debug.LogException(exception);
+#endif
         }
 
         void OnApplicationQuit()
