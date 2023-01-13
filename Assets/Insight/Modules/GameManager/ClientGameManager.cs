@@ -15,9 +15,11 @@ namespace Insight
         public override void Initialize(InsightClient client, ModuleManager manager)
         {
             this.client = client;
-
+#if MIRROR_71_0_OR_NEWER
+            networkManagerTransport = Transport.active;
+#else
             networkManagerTransport = Transport.activeTransport;
-
+#endif
             RegisterHandlers();
         }
 

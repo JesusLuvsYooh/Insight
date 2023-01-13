@@ -222,10 +222,10 @@ namespace Insight
             }
         }
 
-        void OnError(Exception exception)
+        void OnError(TransportError error, string reason)
         {
             // TODO Let's discuss how we will handle errors
-            Debug.LogException(exception);
+            Debug.LogWarning($"Client Transport Error: {error}: {reason}");
         }
 
         void OnApplicationQuit()

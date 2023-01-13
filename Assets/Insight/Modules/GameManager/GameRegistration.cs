@@ -23,9 +23,11 @@ namespace Insight
         {
             client = insight;
             client.transport.OnClientConnected += SendGameRegistrationToGameManager;
-
+#if MIRROR_71_0_OR_NEWER
+            networkManagerTransport = Transport.active;
+#else
             networkManagerTransport = Transport.activeTransport;
-
+#endif
             RegisterHandlers();
             GatherCmdArgs();
 
