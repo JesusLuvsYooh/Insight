@@ -15,24 +15,6 @@ EditorBuildSettings:
     path: Assets/InsightExamples/3. Login/LoginExample.unity
     guid: 80d76fac687acf3428121d10d8ca792b
   - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
+    path: Assets/InsightExamples/4. MasterServer/Scenes/SuperAwesomeGame.unity
+    guid: 8d71aff605388094ab97a98524d9e682
   m_configObjects: {}
