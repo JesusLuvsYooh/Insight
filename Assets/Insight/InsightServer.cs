@@ -132,10 +132,10 @@ namespace Insight
             }
         }
 
-        void OnError(int connectionId, Exception exception)
+        void OnError(int connectionId, TransportError error, string reason)
         {
             // TODO Let's discuss how we will handle errors
-            Debug.LogException(exception);
+            Debug.LogWarning($"Insight Server Transport Error for connId={connectionId}: {error}: {reason}.");
         }
 
         public string GetConnectionInfo(int connectionId)
