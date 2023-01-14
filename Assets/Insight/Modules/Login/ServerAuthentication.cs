@@ -45,12 +45,19 @@ namespace Insight
                 {
                     string UniqueId = Guid.NewGuid().ToString();
 
-                    registeredUsers.Add(new UserContainer()
+                    if (GetUserByConnection(netMsg.connectionId) == null)
                     {
-                        username = message.AccountName,
-                        uniqueId = UniqueId,
-                        connectionId = netMsg.connectionId
-                    });
+                        registeredUsers.Add(new UserContainer()
+                        {
+                            username = message.AccountName,
+                            uniqueId = UniqueId,
+                            connectionId = netMsg.connectionId
+                        });
+                    }
+                    else
+                    {
+                        UniqueId = GetUserByConnection(netMsg.connectionId).uniqueId;
+                    }
 
                     netMsg.Reply(new LoginResponseMsg()
                     {
@@ -70,14 +77,18 @@ namespace Insight
             }
             else
             {
-                string UniqueId = Guid.NewGuid().ToString();
-
-                registeredUsers.Add(new UserContainer()
+                // A check to stop duplicate registered users, either from glitches, or client abuse.
+                if (GetUserByConnection(netMsg.connectionId) == null)
                 {
-                    username = message.AccountName,
-                    uniqueId = UniqueId,
-                    connectionId = netMsg.connectionId
-                });
+                    string UniqueId = Guid.NewGuid().ToString();
+
+                    registeredUsers.Add(new UserContainer()
+                    {
+                        username = message.AccountName,
+                        uniqueId = UniqueId,
+                        connectionId = netMsg.connectionId
+                    });
+                }
 
                 netMsg.Reply(new LoginResponseMsg()
                 {
