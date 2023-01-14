@@ -40,7 +40,7 @@ namespace Insight
                 //Check the username and password. Again this is bad code for example only. REPLACE ME
                 if (message.AccountName.Equals("root") && message.AccountPassword.Equals("password"))
                 {
-                     string UniqueId = Guid.NewGuid().ToString();
+                    string UniqueId = Guid.NewGuid().ToString();
 
                     if (GetUserByConnection(netMsg.connectionId) == null)
                     {
