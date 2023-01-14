@@ -225,11 +225,18 @@ namespace Insight
                 insightNetworkConnection.TransportReceive(data);
             }
         }
-
+#if MIRROR_71_0_OR_NEWER
+        void OnError(int connectionId, TransportError error, string reason)
+#else
         void OnError(int connectionId, Exception exception)
+#endif
         {
             // TODO Let's discuss how we will handle errors
+#if MIRROR_71_0_OR_NEWER
+            Debug.LogWarning($"Insight Server Transport Error for connId={connectionId}: {error}: {reason}.");
+#else
             Debug.LogException(exception);
+#endif
         }
 
         public string GetConnectionInfo(int connectionId)

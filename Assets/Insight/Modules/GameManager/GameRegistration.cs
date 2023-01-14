@@ -33,7 +33,12 @@ namespace Insight
             //NetworkManager.singleton.OnServerDisconnect = OnServerDisconnect;
             //NetworkManager.singleton.OnServerAddPlayer = OnServerAddPlayer;
 
+#if MIRROR_71_0_OR_NEWER
+             networkManagerTransport = Transport.active;
+#else
             networkManagerTransport = Transport.activeTransport;
+
+#endif
 
             //networkManagerTransport.OnServerDisconnected = OnServerDisconnect;
             //networkManagerTransport.OnServerConnected = OnServerCconnected;
