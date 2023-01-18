@@ -13,6 +13,8 @@ namespace Insight
 
         public List<UserContainer> registeredUsers = new List<UserContainer>();
 
+        private string UniqueId = "";
+
         public override void Initialize(InsightServer server, ModuleManager manager)
         {
             this.server = server;
@@ -43,7 +45,7 @@ namespace Insight
                 //Check the username and password. Again this is bad code for example only. REPLACE ME
                 if (message.AccountName.Equals("root") && message.AccountPassword.Equals("password"))
                 {
-                    string UniqueId = Guid.NewGuid().ToString();
+                    UniqueId = Guid.NewGuid().ToString();
 
                     if (GetUserByConnection(netMsg.connectionId) == null)
                     {
@@ -80,7 +82,7 @@ namespace Insight
                 // A check to stop duplicate registered users, either from glitches, or client abuse.
                 if (GetUserByConnection(netMsg.connectionId) == null)
                 {
-                    string UniqueId = Guid.NewGuid().ToString();
+                    UniqueId = Guid.NewGuid().ToString();
 
                     registeredUsers.Add(new UserContainer()
                     {
