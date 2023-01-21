@@ -81,7 +81,8 @@ namespace Insight
                     SceneName = game.SceneName,
                     CurrentPlayers = game.CurrentPlayers,
                     MaxPlayers = game.MaxPlayers,
-                    MinPlayers = game.MinPlayers
+                    MinPlayers = game.MinPlayers,
+                    JoinAnyTime = game.JoinAnyTime
                 });
             }
         }

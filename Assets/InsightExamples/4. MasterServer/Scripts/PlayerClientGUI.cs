@@ -220,6 +220,7 @@ namespace Insight.Examples
                 comp.CurrentPlayers = game.CurrentPlayers;
                 comp.MaxPlayers = game.MaxPlayers;
                 comp.SceneName = game.SceneName;
+                comp.JoinAnyTime = game.JoinAnyTime;
             }
         }
     }

@@ -27,8 +27,9 @@ namespace Insight
             ProcessesMax = ExtractValueInt(Names.ProcessesMax, 5);
             ProcessIdleExit = ExtractValueInt(Names.ProcessIdleExit, 60);
             PlayersMax = ExtractValueInt(Names.PlayersMax, 100);
-            NoisyLogs = ExtractValue(Names.NoisyLogs, "on");
+            NoisyLogs = ExtractValueBool(Names.NoisyLogs, true);
             ServerID = ExtractValue(Names.ServerID, "");
+            JoinAnyTime = ExtractValueBool(Names.JoinAnyTime, false);
         }
 
         #region Arguments
@@ -42,8 +43,9 @@ namespace Insight
         public int ProcessesMax { get; private set; } // amount of GameServers per VPS Spawner, example, 5
         public int ProcessIdleExit { get; private set; } // seconds to close GameServer if no players, example, 60
         public int PlayersMax { get; private set; } // max connections per spawned GameServer, example, 50
-        public string NoisyLogs { get; private set; } // for debugging, on/off, example, on
+        public bool NoisyLogs { get; private set; } // for debugging, on/off, example, on
         public string ServerID { get; private set; } // future use for api or invite codes
+        public bool JoinAnyTime { get; private set; } // allow joining of gamese in progress
         #endregion
 
         #region Helper methods
@@ -60,6 +62,12 @@ namespace Insight
         {
             var number = ExtractValue(argName, defaultValue.ToString());
             return Convert.ToInt32(number);
+        }
+
+        public bool ExtractValueBool(string argName, bool defaultValue = false)
+        {
+            var number = ExtractValue(argName, defaultValue.ToString());
+            return Convert.ToBoolean(number);
         }
 
         public bool IsProvided(string argName)
@@ -83,6 +91,7 @@ namespace Insight
             public string PlayersMax { get { return "-PlayersMax"; } }
             public string NoisyLogs { get { return "-NoisyLogs"; } }
             public string ServerID { get { return "-ServerID"; } }
+            public string JoinAnyTime { get { return "-JoinAnyTime"; } }
         }
     }
 }

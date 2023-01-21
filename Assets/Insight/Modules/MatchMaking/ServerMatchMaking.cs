@@ -7,10 +7,18 @@ using UnityEngine;
 
 namespace Insight
 {
+    public enum MatchMakingResponseType
+    {
+        Search,
+        Wait, //waiting for players
+        Full, //full spwaners
+        Join, //gameserver starts, moving player to server
+        Timeout, //players not found
+        Failed //gameserver timeout
+    }
+
     public class ServerMatchMaking : InsightModule
     {
-
-
         internal InsightServer server;
         ServerAuthentication authModule;
         internal ServerGameManager gameManager;
@@ -18,7 +26,7 @@ namespace Insight
 
         public int MinimumPlayersForGame = 1;
         public float MatchMakingPollRate = 10f;
-        public bool AllowJoiningOfGamesInProgress = false;
+        public bool joinAnyTime = false;
 
         public List<UserContainer> playerQueue = new List<UserContainer>();
         public List<MatchContainer> matchList = new List<MatchContainer>();
@@ -26,7 +34,7 @@ namespace Insight
         bool _spawnInProgress;
 
         private string optionalClientMatchmakingData = "SuperAwesomeGame";
-        
+
         public void Awake()
         {
             AddDependency<MasterSpawner>();
@@ -71,7 +79,7 @@ namespace Insight
 
 
             // temp check, needs to cycle through all spawners and gameservers
-            if (AllowJoiningOfGamesInProgress == false)
+            if(joinAnyTime == false)
             {
                 playerQueue.Add(authModule.GetUserByConnection(netMsg.connectionId));
             }
@@ -80,7 +88,7 @@ namespace Insight
                 if (masterSpawner.registeredSpawners.Count == 0 || gameManager.registeredGameServers.Count == 0)
                 {
                     //if (InsightServer.instance.NoisyLogs)
-                        Debug.Log("[MatchMaking] - No spawners or servers, queuing player.");
+                    Debug.Log("[MatchMaking] - No spawners or servers, queuing player.");
                     playerQueue.Add(authModule.GetUserByConnection(netMsg.connectionId));
                 }
                 else
@@ -107,7 +115,7 @@ namespace Insight
             if (game == null)
             {
                 //if (InsightServer.instance.NoisyLogs)
-                    Debug.Log("[MatchMaking] - No spaces queue player.");
+                Debug.Log("[MatchMaking] - No spaces queue player.");
                 playerQueue.Add(authModule.GetUserByConnection(netMsg.connectionId));
             }
             else
@@ -200,7 +208,7 @@ namespace Insight
                 // args are received in GameRegistration script, add scenes into inspector (verifiedScenes) on GameServer/GameRegistration prefab
                 // (if you want clients to send request scene still)
                 SceneName = optionalClientMatchmakingData,
-
+                JoinAnyTime = joinAnyTime,
                 //This should not be hard coded. Might not be used at all if your GameServer.exe controls scenes.
                 //SceneName = "SuperAwesomeGame",
                 UniqueID = uniqueID

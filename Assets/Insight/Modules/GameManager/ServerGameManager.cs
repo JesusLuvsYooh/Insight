@@ -49,6 +49,7 @@ namespace Insight
                 SceneName = message.SceneName,
                 MaxPlayers = message.MaxPlayers,
                 CurrentPlayers = message.CurrentPlayers,
+                JoinAnyTime = message.JoinAnyTime,
 
                 connectionId = netMsg.connectionId,
             });
@@ -159,5 +160,7 @@ namespace Insight
         public int MaxPlayers;
         public int MinPlayers;
         public int CurrentPlayers;
+
+        public bool JoinAnyTime;
     }
 }

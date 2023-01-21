@@ -20,6 +20,8 @@ namespace Insight
         public int MaxPlayers;
         public int CurrentPlayers;
 
+        public bool JoinAnyTime;
+
         //Current insight flow, is allowing players to send info through master server to game server. (rare use case)
         //You either want to disable that, or add vigorous checks, here we will do a verified scenes string name check as an example
         [Scene] public string[] verifiedScenes;
@@ -160,6 +162,13 @@ namespace Insight
                 UniqueID = args.UniqueID;
             }
 
+            if (args.IsProvided("-JoinAnyTime"))
+            {
+                if (InsightClient.instance.NoisyLogs)
+                    Debug.Log("[Args] - JoinAnyTime: " + args.JoinAnyTime);
+                JoinAnyTime = args.JoinAnyTime;
+            }
+
             MaxPlayers = NetworkManager.singleton.maxConnections;
 
             if (AbortRun == true)
@@ -202,8 +211,9 @@ namespace Insight
                 UniqueID = UniqueID,
                 SceneName = GameScene,
                 MaxPlayers = MaxPlayers,
-                CurrentPlayers = CurrentPlayers
-            });
+                CurrentPlayers = CurrentPlayers,
+                JoinAnyTime = JoinAnyTime
+        });
         }
 
         void SendGameStatusToGameManager()

@@ -65,6 +65,7 @@ namespace Insight
         public string SceneName;
         public int MaxPlayers;
         public int CurrentPlayers;
+        public bool JoinAnyTime;
     }
 
     public class GameStatusMsg : Message
@@ -80,7 +81,8 @@ namespace Insight
 
         //Only valid in the reply from the spawner. So it should be moved to another message
         public string UniqueID; //Guid
-        public string NetworkAddress; 
+        public string NetworkAddress;
+        public bool JoinAnyTime;
     }
 
     //Asks the server to gracefully stop
@@ -105,6 +107,12 @@ namespace Insight
     public class StopMatchMakingMsg : Message
     {
 
+    }
+
+    public class MatchMakingResponseMsg : Message
+    {
+        public float WaitTime;
+        public MatchMakingResponseType ResponseType = MatchMakingResponseType.Wait;
     }
 
     //Sent from a player client requesting the list of currently active games.

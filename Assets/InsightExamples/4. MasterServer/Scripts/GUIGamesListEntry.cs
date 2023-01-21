@@ -15,6 +15,8 @@ namespace Insight.Examples
         public int CurrentPlayers;
         public int MaxPlayers;
 
+        public bool JoinAnyTime;
+
         private bool Init;
 
         private void LateUpdate()
@@ -30,7 +32,15 @@ namespace Insight.Examples
 
         public void HandleSelectButton()
         {
-            clientComp.HandleJoinGameButton(UniqueID);
+            if (JoinAnyTime)
+            {
+                clientComp.HandleJoinGameButton(UniqueID);
+            }
+            else
+            {
+                if (InsightClient.instance.NoisyLogs)
+                    Debug.Log("[GUIGamesListEntry] - Game does not allow joining whilst in progress.");
+            }
         }
     }
 }
