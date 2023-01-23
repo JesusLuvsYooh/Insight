@@ -57,8 +57,8 @@ namespace Insight.Examples
             //Game Status
             foreach (GameContainer game in gameModule.registeredGameServers)
             {
-                activeGamesText.text += game.UniqueId + " - " + game.NetworkAddress + ":" + game.NetworkPort + " - " + game.SceneName + " - " + game.CurrentPlayers + "/" + game.MaxPlayers + " - " + game.JoinAnyTime + Environment.NewLine;
-                currentActiveGamesText += game.NetworkAddress + ":" + game.NetworkPort + " - " + game.SceneName + " - " + game.CurrentPlayers + "/" + game.MaxPlayers + " - " + game.JoinAnyTime + Environment.NewLine;
+                activeGamesText.text += game.UniqueId + " - " + game.NetworkAddress + ":" + game.NetworkPort + " - " + game.SceneName + " - " + game.CurrentPlayers + "/" + game.MaxPlayers + " - " + game.GameName + " - " + game.GameType + " - " + game.JoinAnyTime + Environment.NewLine;
+                currentActiveGamesText += game.NetworkAddress + ":" + game.NetworkPort + " - " + game.SceneName + " - " + game.CurrentPlayers + "/" + game.MaxPlayers + " - " + game.GameName + " - " + game.GameType + " - " + game.JoinAnyTime + Environment.NewLine;
             }
 
             if (previousActiveGamesText != currentActiveGamesText)

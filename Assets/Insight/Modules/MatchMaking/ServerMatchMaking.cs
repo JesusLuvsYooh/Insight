@@ -26,14 +26,17 @@ namespace Insight
 
         public int MinimumPlayersForGame = 1;
         public float MatchMakingPollRate = 10f;
-        public bool joinAnyTime = false;
+        
 
         public List<UserContainer> playerQueue = new List<UserContainer>();
         public List<MatchContainer> matchList = new List<MatchContainer>();
 
         bool _spawnInProgress;
 
-        private string optionalClientMatchmakingData = "SuperAwesomeGame";
+        private string sceneName = "SuperAwesomeGame";
+        private string joinAnyTime = "false";
+        private string gameName = "InsightExample";
+        private string gameType = "FreeForAll";
 
         public void Awake()
         {
@@ -72,16 +75,29 @@ namespace Insight
         {
             if (InsightServer.instance.NoisyLogs)
                 Debug.Log("[MatchMaking] - Player joining MatchMaking.");
-            // Optional player sent data, currently set as scene request (not recommended) 
-            optionalClientMatchmakingData = netMsg.ReadMessage<StartMatchMakingMsg>().SceneName;
-            if (InsightServer.instance.NoisyLogs)
-                Debug.Log("[MatchMaking] - Client data received: " + optionalClientMatchmakingData);
 
+            StartMatchMakingMsg message = netMsg.ReadMessage<StartMatchMakingMsg>();
+
+            sceneName = message.SceneName;
+            gameName = message.GameName;
+            gameType = message.GameType;
+
+            if (InsightServer.instance.NoisyLogs)
+                Debug.Log("[MatchMaking] - Client data received: " + sceneName + " -  " + gameName + " - " + gameType);
+
+            netMsg.Reply(new MatchMakingResponseMsg()
+            {
+                ResponseType = (ushort)MatchMakingResponseType.Search
+            });
 
             // temp check, needs to cycle through all spawners and gameservers
-            if(joinAnyTime == false)
+            if (joinAnyTime == "false" || joinAnyTime == "False")
             {
                 playerQueue.Add(authModule.GetUserByConnection(netMsg.connectionId));
+                netMsg.Reply(new MatchMakingResponseMsg()
+                {
+                    ResponseType = MatchMakingResponseType.Wait
+                });
             }
             else
             {
@@ -90,6 +106,10 @@ namespace Insight
                     //if (InsightServer.instance.NoisyLogs)
                     Debug.Log("[MatchMaking] - No spawners or servers, queuing player.");
                     playerQueue.Add(authModule.GetUserByConnection(netMsg.connectionId));
+                    netMsg.Reply(new MatchMakingResponseMsg()
+                    {
+                        ResponseType = MatchMakingResponseType.Failed
+                    });
                 }
                 else
                 {
@@ -101,6 +121,7 @@ namespace Insight
         void SearchForServerSpaces(InsightNetworkMessage netMsg)
         {
             GameContainer game = null;
+            
 
             foreach (GameContainer gameTemp in gameManager.registeredGameServers)
             {
@@ -109,14 +130,23 @@ namespace Insight
                     game = gameTemp;
                     if (InsightServer.instance.NoisyLogs)
                         Debug.Log("[MatchMaking] - Game with space found.");
+                    netMsg.Reply(new MatchMakingResponseMsg()
+                    {
+                        ResponseType = MatchMakingResponseType.Join
+                    });
+                    break;
                 }
             };
 
             if (game == null)
             {
-                //if (InsightServer.instance.NoisyLogs)
+                if (InsightServer.instance.NoisyLogs)
                 Debug.Log("[MatchMaking] - No spaces queue player.");
                 playerQueue.Add(authModule.GetUserByConnection(netMsg.connectionId));
+                netMsg.Reply(new MatchMakingResponseMsg()
+                {
+                    ResponseType = MatchMakingResponseType.Full
+                });
             }
             else
             {
@@ -207,11 +237,13 @@ namespace Insight
                 // weirdly it was setup to send requested scene name, but then was hardcoded to always be "SuperAwesomeGame"
                 // args are received in GameRegistration script, add scenes into inspector (verifiedScenes) on GameServer/GameRegistration prefab
                 // (if you want clients to send request scene still)
-                SceneName = optionalClientMatchmakingData,
-                JoinAnyTime = joinAnyTime,
+                SceneName = sceneName,
                 //This should not be hard coded. Might not be used at all if your GameServer.exe controls scenes.
                 //SceneName = "SuperAwesomeGame",
-                UniqueID = uniqueID
+                UniqueID = uniqueID,
+                JoinAnyTime = joinAnyTime,
+                GameName = gameName,
+                GameType = gameType
             };
 
             List<UserContainer> matchUsers = new List<UserContainer>();

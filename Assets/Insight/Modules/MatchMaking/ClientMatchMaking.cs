@@ -7,14 +7,14 @@ namespace Insight
     {
         InsightClient client;
 
-        public event Action<MatchMakingResponseType, string> OnMatchMakingChange;
+        ClientGameManager gameManager;
 
-       // private float TimeSpan = 0.0f;
+        public event Action<MatchMakingResponseType, string> OnMatchMakingChange;
 
         public override void Initialize(InsightClient client, ModuleManager manager)
         {
             this.client = client;
-
+            gameManager = manager.GetModule<ClientGameManager>();
             RegisterHandlers();
         }
 
@@ -52,7 +52,7 @@ namespace Insight
                 status = "MatchMaking failed!";
                 break;
             }
-
+            Debug.Log("[MatchMakingResponse] " + status);
             OnMatchMakingChange?.Invoke((MatchMakingResponseType)message.ResponseType, status);
         }
 

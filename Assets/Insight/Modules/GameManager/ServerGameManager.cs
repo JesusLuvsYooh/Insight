@@ -50,8 +50,10 @@ namespace Insight
                 MaxPlayers = message.MaxPlayers,
                 CurrentPlayers = message.CurrentPlayers,
                 JoinAnyTime = message.JoinAnyTime,
+                GameName = message.GameName,
+                GameType = message.GameType,
 
-                connectionId = netMsg.connectionId,
+                connectionId = netMsg.connectionId
             });
 
             if (server.autoAuthClients)
@@ -162,5 +164,7 @@ namespace Insight
         public int CurrentPlayers;
 
         public bool JoinAnyTime;
+        public string GameName;
+        public string GameType;
     }
 }

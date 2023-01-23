@@ -16,6 +16,8 @@ namespace Insight.Examples
         public int MaxPlayers;
 
         public bool JoinAnyTime;
+        public string GameName;
+        public string GameType;
 
         private bool Init;
 

@@ -215,8 +215,11 @@ namespace Insight
                     //Should that be passed back and used here?
 
                     SceneName = message.SceneName,
-                    NetworkAddress = SpawnerNetworkAddress,
-                    UniqueID = message.UniqueID
+                    NetworkAddress = SpawnerNetworkAddress, // why are we sending back something that was sent to us?
+                    UniqueID = message.UniqueID,
+                    JoinAnyTime = message.JoinAnyTime,
+                    GameName = message.GameName,
+                    GameType = message.GameType
                 });
             }
         }
@@ -311,6 +314,37 @@ namespace Insight
                     Debug.Log("[ProcessSpawner] - UniqueID was not provided for spawn. Generating: " + spawnProperties.UniqueID);
             }
 
+            
+            if (string.IsNullOrEmpty(spawnProperties.JoinAnyTime))
+            {
+                spawnProperties.JoinAnyTime = "false";
+
+                if (NoisyLogs)
+                    Debug.Log("[ProcessSpawner] - JoinAnyTime was not provided for spawn.");
+            }
+            if (string.IsNullOrEmpty(spawnProperties.GameName))
+            {
+                spawnProperties.GameName = "0";
+
+                if (NoisyLogs)
+                    Debug.Log("[ProcessSpawner] - GameName was not provided for spawn.");
+            }
+            if (string.IsNullOrEmpty(spawnProperties.GameType))
+            {
+                spawnProperties.GameType = "0";
+
+                if (NoisyLogs)
+                    Debug.Log("[ProcessSpawner] - GameType was not provided for spawn.");
+            }
+            if (string.IsNullOrEmpty(spawnProperties.SceneName))
+            {
+                //spawnProperties.SceneName = "";
+
+                if (NoisyLogs)
+                    Debug.Log("[ProcessSpawner] - Scene name was not provided for spawn.");
+                return false;
+            }
+
             Process p = new Process();
             // Put the process path and the process name together. We use
             // Path.Combine for this, which will include correct directory
@@ -321,7 +355,10 @@ namespace Insight
                 " -NetworkAddress " + SpawnerNetworkAddress +
                 " -NetworkPort " + (StartingNetworkPort + thisPort * allocatedPorts) +
                 " -SceneName " + spawnProperties.SceneName +
-                " -UniqueID " + spawnProperties.UniqueID; //What to do if the UniqueID or any other value is null??
+                " -UniqueID " + spawnProperties.UniqueID + //What to do if the UniqueID or any other value is null??
+                " -JoinAnyTime " + spawnProperties.JoinAnyTime +
+                " -GameName " + spawnProperties.GameName +
+                " -GameType " + spawnProperties.GameType;
 
             if (System.IO.File.Exists(p.StartInfo.FileName))
             {

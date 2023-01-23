@@ -40,11 +40,20 @@ namespace Insight.Examples
         public List<GameContainer> gamesList = new List<GameContainer>();
 
         [Header("Playlist/Game Name")]
-        public string GameName = "SuperAwesomeGame";
+        public string sceneName = "SuperAwesomeGame";
+        public string gameName = "InsightExample"; // no spaces, think of it as an ID 
+        public string gameType = "Practice";
+
+        [Header("Matchmaking Options")]
+        public Dropdown dropdownSceneName;
+        public Dropdown dropdownGameType;
+
 
         private void Start()
         {
             SwitchToLogin();
+
+            SetupUI();
         }
 
         void Update()
@@ -120,18 +129,18 @@ namespace Insight.Examples
             StartMatchMakingButton.SetActive(false);
             StopMatchMakingButton.SetActive(true);
 
-            matchComp.SendStartMatchMaking(new StartMatchMakingMsg() { SceneName = GameName });
+            matchComp.SendStartMatchMaking(new StartMatchMakingMsg() { SceneName = sceneName, GameName = gameName, GameType = gameType });
         }
 
         public void SetSceneMakingButton(int _value)
         {
             if (_value == 1)
             {
-                GameName = "MyScene";
+                sceneName = "MyScene";
             }
             else
             {
-                GameName = "MyScene2";
+                sceneName = "MyScene2";
             }
 
             HandleStartMatchMakingButton();
@@ -182,7 +191,7 @@ namespace Insight.Examples
 
         public void HandleCreateGameButton()
         {
-            gameComp.SendRequestSpawnStart(new RequestSpawnStartMsg() { SceneName = GameName });
+            gameComp.SendRequestSpawnStart(new RequestSpawnStartMsg() { SceneName = sceneName, GameName = gameName, GameType = gameType });
         }
 
         public void HandleSendChatButton()
@@ -221,7 +230,54 @@ namespace Insight.Examples
                 comp.MaxPlayers = game.MaxPlayers;
                 comp.SceneName = game.SceneName;
                 comp.JoinAnyTime = game.JoinAnyTime;
+                comp.GameName = game.GameName;
+                comp.GameType = game.GameType;
             }
         }
+
+        void SetupUI()
+        {
+            dropdownGameType.options.Clear();
+            List<string> listOfGameType = new List<string>();
+            listOfGameType.Add("Practice");
+            listOfGameType.Add("Free For All");
+            listOfGameType.Add("Deathmatch");
+            listOfGameType.Add("Battle Royale");
+
+            foreach (var _gameType in listOfGameType)
+            {
+                dropdownGameType.options.Add(new Dropdown.OptionData() { text = _gameType });
+            }
+            dropdownGameType.captionText.text = listOfGameType[0];
+            DropdownSelectedGameType(dropdownGameType);
+            dropdownGameType.onValueChanged.AddListener(delegate { DropdownSelectedGameType(dropdownGameType); });
+
+            dropdownSceneName.options.Clear();
+            List<string> listOfSceneName = new List<string>();
+            listOfSceneName.Add("SuperAwesomeGame");
+            listOfSceneName.Add("GreatGoodMap");
+            listOfSceneName.Add("TwistedTownScene");
+
+            foreach (var _sceneName in listOfSceneName)
+            {
+                dropdownSceneName.options.Add(new Dropdown.OptionData() { text = _sceneName });
+            }
+            dropdownSceneName.captionText.text = listOfSceneName[0];
+            DropdownSelectedSceneName(dropdownSceneName);
+            dropdownSceneName.onValueChanged.AddListener(delegate { DropdownSelectedSceneName(dropdownSceneName); });
+        }
+
+        void DropdownSelectedSceneName(Dropdown _dropdown)
+        {
+            int index = _dropdown.value;
+            sceneName = _dropdown.options[index].text;
+        }
+
+        void DropdownSelectedGameType(Dropdown _dropdown)
+        {
+            int index = _dropdown.value;
+            gameType = _dropdown.options[index].text;
+        }
+        
     }
 }

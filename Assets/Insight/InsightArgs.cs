@@ -22,7 +22,6 @@ namespace Insight
             UniqueID = ExtractValue(Names.UniqueID, "");
             SceneName = ExtractValue(Names.SceneName, "");
             FrameRate = ExtractValueInt(Names.FrameRate, 30);
-            GameMode = ExtractValueInt(Names.GameMode, 7777);
             ProcessName = ExtractValue(Names.ProcessName, "GameServer.exe");
             ProcessesMax = ExtractValueInt(Names.ProcessesMax, 5);
             ProcessIdleExit = ExtractValueInt(Names.ProcessIdleExit, 60);
@@ -30,6 +29,8 @@ namespace Insight
             NoisyLogs = ExtractValueBool(Names.NoisyLogs, true);
             ServerID = ExtractValue(Names.ServerID, "");
             JoinAnyTime = ExtractValueBool(Names.JoinAnyTime, false);
+            GameName = ExtractValue(Names.GameName, "");
+            GameType = ExtractValue(Names.GameType, "");
         }
 
         #region Arguments
@@ -38,7 +39,6 @@ namespace Insight
         public string UniqueID { get; private set; } // ignore, auto set for spawned GameServers
         public string SceneName { get; private set; } // example, Map2
         public int FrameRate { get; private set; } // example, 30
-        public int GameMode { get; private set; } // example, 1 = free for all, 2 deathmatch
         public string ProcessName { get; private set; } // example. GameServer.exe
         public int ProcessesMax { get; private set; } // amount of GameServers per VPS Spawner, example, 5
         public int ProcessIdleExit { get; private set; } // seconds to close GameServer if no players, example, 60
@@ -46,6 +46,8 @@ namespace Insight
         public bool NoisyLogs { get; private set; } // for debugging, on/off, example, on
         public string ServerID { get; private set; } // future use for api or invite codes
         public bool JoinAnyTime { get; private set; } // allow joining of gamese in progress
+        public string GameName { get; private set; } // name of your game
+        public string GameType { get; private set; } // example, 1 = free for all, 2 deathmatch
         #endregion
 
         #region Helper methods
@@ -84,7 +86,6 @@ namespace Insight
             public string UniqueID { get { return "-UniqueID"; } }
             public string SceneName { get { return "-SceneName"; } }
             public string FrameRate { get { return "-FrameRate"; } }
-            public string GameMode { get { return "-GameMode"; } }
             public string ProcessName { get { return "-ProcessName"; } }
             public string ProcessesMax { get { return "-ProcessesMax"; } }
             public string ProcessIdleExit { get { return "-ProcessIdleExit"; } }
@@ -92,6 +93,8 @@ namespace Insight
             public string NoisyLogs { get { return "-NoisyLogs"; } }
             public string ServerID { get { return "-ServerID"; } }
             public string JoinAnyTime { get { return "-JoinAnyTime"; } }
+            public string GameName { get { return "-GameName"; } }
+            public string GameType { get { return "-GameType"; } }
         }
     }
 }

@@ -9,6 +9,9 @@ namespace Insight
     {
         InsightClient client;
         Transport networkManagerTransport;
+        public string SceneName;
+        public string GameName;
+        public string GameType;
 
         public List<GameContainer> gamesList = new List<GameContainer>();
 
@@ -82,7 +85,9 @@ namespace Insight
                     CurrentPlayers = game.CurrentPlayers,
                     MaxPlayers = game.MaxPlayers,
                     MinPlayers = game.MinPlayers,
-                    JoinAnyTime = game.JoinAnyTime
+                    JoinAnyTime = game.JoinAnyTime,
+                    GameName = game.GameName,
+                    GameType = game.GameType
                 });
             }
         }

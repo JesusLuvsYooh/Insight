@@ -66,6 +66,8 @@ namespace Insight
         public int MaxPlayers;
         public int CurrentPlayers;
         public bool JoinAnyTime;
+        public string GameName;
+        public string GameType;
     }
 
     public class GameStatusMsg : Message
@@ -82,7 +84,11 @@ namespace Insight
         //Only valid in the reply from the spawner. So it should be moved to another message
         public string UniqueID; //Guid
         public string NetworkAddress;
-        public bool JoinAnyTime;
+        public string JoinAnyTime;
+
+        public string GameName;
+        public string GameType;
+
     }
 
     //Asks the server to gracefully stop
@@ -101,6 +107,8 @@ namespace Insight
     public class StartMatchMakingMsg : Message
     {
         public string SceneName;
+        public string GameName;
+        public string GameType;
     }
 
     //Sent from a player client when they want to quit matchmaking
