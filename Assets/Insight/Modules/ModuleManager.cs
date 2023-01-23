@@ -55,7 +55,10 @@ namespace Insight
 
                 // Add modules
                 foreach (var module in modules)
+                {
                     AddModule(module);
+                    //Debug.Log("module: " + module.name);
+                }
 
                 // Initialize modules
                 InitializeModules(client, server);

@@ -679,6 +679,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114178012850769670, guid: 6d4ef6489e7e342acad73552aaaea6d9,
         type: 3}
+      propertyPath: verifiedScenes.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114178012850769670, guid: 6d4ef6489e7e342acad73552aaaea6d9,
+        type: 3}
       propertyPath: networkManagerTelepathyTransport
       value: 
       objectReference: {fileID: 0}

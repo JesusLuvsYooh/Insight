@@ -20,6 +20,7 @@ namespace Insight
 
         InsightNetworkConnection insightNetworkConnection;
         public ClientAuthentication clientAuthentication;
+        public InsightGameSettings gameSettingsModule;
 
         public float ReconnectDelayInSeconds = 5f;
         float _reconnectTimer;

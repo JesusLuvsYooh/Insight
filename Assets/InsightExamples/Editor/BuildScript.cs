@@ -87,7 +87,8 @@ namespace Insight.Examples
             {
         ScenesRoot+"GameServer.unity",
         //Scene used for MasterServer Demo
-        ScenesRoot+"SuperAwesomeGame.unity"
+        ScenesRoot+"SuperAwesomeGame.unity",
+        ScenesRoot+"GreatGoodMap.unity"
         };
             PlayerSettings.productName = "GameServer";
             BuildPipeline.BuildPlayer(gameServerScenes, path + "/GameServer.exe", GetBuildTarget(), BuildOptions);
@@ -99,7 +100,8 @@ namespace Insight.Examples
             {
         ScenesRoot+"PlayerClient.unity",
         //Scene used for MasterServer Demo
-        ScenesRoot+"SuperAwesomeGame.unity"
+        ScenesRoot+"SuperAwesomeGame.unity",
+        ScenesRoot+"GreatGoodMap.unity"
         };
             PlayerSettings.productName = "PlayerClient";
             BuildPipeline.BuildPlayer(scenes, path + "/PlayerClient.exe", GetBuildTarget(), BuildOptions);

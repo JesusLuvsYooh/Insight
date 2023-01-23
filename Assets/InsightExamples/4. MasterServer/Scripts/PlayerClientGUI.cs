@@ -43,17 +43,19 @@ namespace Insight.Examples
         public string sceneName = "SuperAwesomeGame";
         public string gameName = "InsightExample"; // no spaces, think of it as an ID 
         public string gameType = "Practice";
+        public string serverRegion = "Practice";
 
         [Header("Matchmaking Options")]
         public Dropdown dropdownSceneName;
         public Dropdown dropdownGameType;
+        public Dropdown dropdownServerRegion;
 
 
         private void Start()
         {
             SwitchToLogin();
 
-            SetupUI();
+            //SetupUI();
         }
 
         void Update()
@@ -108,6 +110,8 @@ namespace Insight.Examples
             RootLoginPanel.SetActive(false);
             RootMainPanel.SetActive(true);
             RootGamePanel.SetActive(false);
+
+            SetupMatchMakingSettings();
         }
 
         private void SwitchToGamesList()
@@ -130,20 +134,6 @@ namespace Insight.Examples
             StopMatchMakingButton.SetActive(true);
 
             matchComp.SendStartMatchMaking(new StartMatchMakingMsg() { SceneName = sceneName, GameName = gameName, GameType = gameType });
-        }
-
-        public void SetSceneMakingButton(int _value)
-        {
-            if (_value == 1)
-            {
-                sceneName = "MyScene";
-            }
-            else
-            {
-                sceneName = "MyScene2";
-            }
-
-            HandleStartMatchMakingButton();
         }
 
         public void HandleStopMatchMakingButton()
@@ -235,29 +225,14 @@ namespace Insight.Examples
             }
         }
 
-        void SetupUI()
+        void SetupMatchMakingSettings()
         {
-            dropdownGameType.options.Clear();
-            List<string> listOfGameType = new List<string>();
-            listOfGameType.Add("Practice");
-            listOfGameType.Add("Free For All");
-            listOfGameType.Add("Deathmatch");
-            listOfGameType.Add("Battle Royale");
-
-            foreach (var _gameType in listOfGameType)
-            {
-                dropdownGameType.options.Add(new Dropdown.OptionData() { text = _gameType });
-            }
-            dropdownGameType.captionText.text = listOfGameType[0];
-            DropdownSelectedGameType(dropdownGameType);
-            dropdownGameType.onValueChanged.AddListener(delegate { DropdownSelectedGameType(dropdownGameType); });
-
             dropdownSceneName.options.Clear();
             List<string> listOfSceneName = new List<string>();
-            listOfSceneName.Add("SuperAwesomeGame");
-            listOfSceneName.Add("GreatGoodMap");
-            listOfSceneName.Add("TwistedTownScene");
-
+            foreach (var value in InsightClient.instance.gameSettingsModule.verifiedScenesNames)
+            {
+                listOfSceneName.Add(value.ToString());
+            }
             foreach (var _sceneName in listOfSceneName)
             {
                 dropdownSceneName.options.Add(new Dropdown.OptionData() { text = _sceneName });
@@ -265,6 +240,36 @@ namespace Insight.Examples
             dropdownSceneName.captionText.text = listOfSceneName[0];
             DropdownSelectedSceneName(dropdownSceneName);
             dropdownSceneName.onValueChanged.AddListener(delegate { DropdownSelectedSceneName(dropdownSceneName); });
+
+
+            dropdownGameType.options.Clear();
+            List<string> listOfGameType = new List<string>();
+            foreach (var value in InsightClient.instance.gameSettingsModule.verifiedGameTypes)
+            {
+                listOfGameType.Add(value);
+            }
+            foreach (var _gameType in listOfGameType)
+            {
+                dropdownGameType.options.Add(new Dropdown.OptionData() { text = _gameType });
+            }
+            dropdownGameType.captionText.text = listOfGameType[0];
+            DropdownSelectedGameType(dropdownGameType);
+            dropdownGameType.onValueChanged.AddListener(delegate { DropdownSelectedGameType(dropdownGameType); });
+           
+
+            dropdownServerRegion.options.Clear();
+            List<string> listOfServerRegion = new List<string>();
+            foreach (var value in InsightClient.instance.gameSettingsModule.verifiedServerRegions)
+            {
+                listOfServerRegion.Add(value);
+            }
+            foreach (var _serverRegion in listOfServerRegion)
+            {
+                dropdownServerRegion.options.Add(new Dropdown.OptionData() { text = _serverRegion });
+            }
+            dropdownServerRegion.captionText.text = listOfServerRegion[0];
+            DropdownSelectedServerRegion(dropdownServerRegion);
+            dropdownServerRegion.onValueChanged.AddListener(delegate { DropdownSelectedServerRegion(dropdownServerRegion); });
         }
 
         void DropdownSelectedSceneName(Dropdown _dropdown)
@@ -278,6 +283,12 @@ namespace Insight.Examples
             int index = _dropdown.value;
             gameType = _dropdown.options[index].text;
         }
-        
+
+        void DropdownSelectedServerRegion(Dropdown _dropdown)
+        {
+            int index = _dropdown.value;
+            serverRegion = _dropdown.options[index].text;
+        }
+
     }
 }

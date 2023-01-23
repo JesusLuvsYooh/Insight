@@ -25,9 +25,6 @@ namespace Insight
         public string GameName;
         public string GameType;
 
-        //Current insight flow, is allowing players to send info through master server to game server. (rare use case)
-        //You either want to disable that, or add vigorous checks, here we will do a verified scenes string name check as an example
-        [Scene] public string[] verifiedScenes;
         private bool AbortRun = false;
 
         public override void Initialize(InsightClient insight, ModuleManager manager)
@@ -125,11 +122,11 @@ namespace Insight
             {
                 if (InsightClient.instance.NoisyLogs)
                     Debug.Log("[Args] - SceneName: " + args.SceneName);
-
+                
                 // if no scenes registered for client control verification, presume no scene switch
-                if (verifiedScenes.Length > 0)
+                if (client.gameSettingsModule.verifiedScenesNames.Length > 0)
                 {
-                    foreach (string _sceneName in verifiedScenes)
+                    foreach (string _sceneName in client.gameSettingsModule.verifiedScenesNames)
                     {
                         if (_sceneName == args.SceneName)
                         {
@@ -155,6 +152,7 @@ namespace Insight
                     GameScene = args.SceneName;
                     //SceneManager.LoadScene(GameScene);
                 }
+                
                 NetworkManager.singleton.onlineScene = GameScene;
             }
 
