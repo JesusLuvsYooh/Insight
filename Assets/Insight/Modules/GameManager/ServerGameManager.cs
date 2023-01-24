@@ -46,7 +46,7 @@ namespace Insight
                 NetworkAddress = message.NetworkAddress,
                 NetworkPort = message.NetworkPort,
                 UniqueId = message.UniqueID,
-                SceneName = message.SceneName,
+                SceneID = message.SceneID,
                 MaxPlayers = message.MaxPlayers,
                 CurrentPlayers = message.CurrentPlayers,
                 JoinAnyTime = message.JoinAnyTime,
@@ -126,7 +126,7 @@ namespace Insight
                 {
                     NetworkAddress = game.NetworkAddress,
                     NetworkPort = game.NetworkPort,
-                    SceneName = game.SceneName
+                    SceneID = game.SceneID
                 });
             }
         }
@@ -158,13 +158,13 @@ namespace Insight
         public string UniqueId;
         public int connectionId;
 
-        public string SceneName;
+        public int SceneID;
         public int MaxPlayers;
         public int MinPlayers;
         public int CurrentPlayers;
 
         public bool JoinAnyTime;
         public string GameName;
-        public string GameType;
+        public int GameType;
     }
 }

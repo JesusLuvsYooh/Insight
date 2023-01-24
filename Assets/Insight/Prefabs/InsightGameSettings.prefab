@@ -43,7 +43,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a596511d75934602b1d3218bc918f21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  verifiedScenesNames:
+  verifiedScenes:
   - Assets/InsightExamples/4. MasterServer/Scenes/SuperAwesomeGame.unity
   - Assets/InsightExamples/4. MasterServer/Scenes/GreatGoodMap.unity
   verifiedGameTypes:
@@ -51,7 +51,6 @@ MonoBehaviour:
   - Deathmatch
   - Battle Royale
   verifiedServerRegions:
-  - US - NVirginia
-  - EU - London
-  - Asia - Singapore
-  - Middle East - Dubai
+  - US
+  - EU
+  - Asia

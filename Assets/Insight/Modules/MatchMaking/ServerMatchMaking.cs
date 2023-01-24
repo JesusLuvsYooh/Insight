@@ -33,10 +33,10 @@ namespace Insight
 
         bool _spawnInProgress;
 
-        private string sceneName = "SuperAwesomeGame";
+        private int sceneID = 0;
         private string joinAnyTime = "false";
         private string gameName = "InsightExample";
-        private string gameType = "FreeForAll";
+        private int gameType = 0;
 
         public void Awake()
         {
@@ -78,12 +78,12 @@ namespace Insight
 
             StartMatchMakingMsg message = netMsg.ReadMessage<StartMatchMakingMsg>();
 
-            sceneName = message.SceneName;
+            sceneID = message.SceneID;
             gameName = message.GameName;
             gameType = message.GameType;
 
             if (InsightServer.instance.NoisyLogs)
-                Debug.Log("[MatchMaking] - Client data received: " + sceneName + " -  " + gameName + " - " + gameType);
+                Debug.Log("[MatchMaking] - Client data received: " + sceneID + " -  " + gameName + " - " + gameType);
 
             netMsg.Reply(new MatchMakingResponseMsg()
             {
@@ -157,7 +157,7 @@ namespace Insight
                 {
                     NetworkAddress = game.NetworkAddress,
                     NetworkPort = game.NetworkPort,
-                    SceneName = game.SceneName
+                    SceneID = game.SceneID
                 });
 
                 if (InsightServer.instance.PlayerStayConnectedToMasterServer == false)
@@ -237,7 +237,7 @@ namespace Insight
                 // weirdly it was setup to send requested scene name, but then was hardcoded to always be "SuperAwesomeGame"
                 // args are received in GameRegistration script, add scenes into inspector (verifiedScenes) on GameServer/GameRegistration prefab
                 // (if you want clients to send request scene still)
-                SceneName = sceneName,
+                SceneID = sceneID,
                 //This should not be hard coded. Might not be used at all if your GameServer.exe controls scenes.
                 //SceneName = "SuperAwesomeGame",
                 UniqueID = uniqueID,
@@ -368,7 +368,7 @@ namespace Insight
                 {
                     NetworkAddress = MatchServer.NetworkAddress,
                     NetworkPort = MatchServer.NetworkPort,
-                    SceneName = MatchServer.SceneName
+                    SceneID = MatchServer.SceneID
                 });
             }
         }

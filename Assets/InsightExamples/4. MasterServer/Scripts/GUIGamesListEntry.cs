@@ -11,13 +11,13 @@ namespace Insight.Examples
         public Text PlayerCountText;
 
         public string UniqueID;
-        public string SceneName;
+        public int SceneID;
         public int CurrentPlayers;
         public int MaxPlayers;
 
         public bool JoinAnyTime;
         public string GameName;
-        public string GameType;
+        public int GameType;
 
         private bool Init;
 
@@ -27,7 +27,7 @@ namespace Insight.Examples
             {
                 Init = true;
 
-                SceneNameText.text = SceneName;
+                SceneNameText.text = SceneID.ToString();
                 PlayerCountText.text = CurrentPlayers + "/" + MaxPlayers;
             }
         }

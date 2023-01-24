@@ -9,9 +9,9 @@ namespace Insight
     {
         InsightClient client;
         Transport networkManagerTransport;
-        public string SceneName;
+        public int SceneID;
         public string GameName;
-        public string GameType;
+        public int GameType;
 
         public List<GameContainer> gamesList = new List<GameContainer>();
 
@@ -39,7 +39,7 @@ namespace Insight
         {
             ChangeServerMsg message = netMsg.ReadMessage<ChangeServerMsg>();
 
-            Debug.Log("[InsightClient] - Connecting to GameServer: " + message.NetworkAddress + ":" + message.NetworkPort + "/" + message.SceneName);
+            Debug.Log("[InsightClient] - Connecting to GameServer: " + message.NetworkAddress + ":" + message.NetworkPort + "/" + message.SceneID);
 
             if(networkManagerTransport is MultiplexTransport) {
                 ushort startPort = message.NetworkPort;
@@ -76,12 +76,12 @@ namespace Insight
 
             foreach (GameContainer game in message.gamesArray)
             {
-                Debug.Log(game.SceneName);
+                //Debug.Log(game.SceneID);
 
                 gamesList.Add(new GameContainer()
                 {
                     UniqueId = game.UniqueId,
-                    SceneName = game.SceneName,
+                    SceneID = game.SceneID,
                     CurrentPlayers = game.CurrentPlayers,
                     MaxPlayers = game.MaxPlayers,
                     MinPlayers = game.MinPlayers,

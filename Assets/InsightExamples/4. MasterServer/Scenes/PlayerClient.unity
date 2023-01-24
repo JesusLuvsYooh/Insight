@@ -1056,7 +1056,7 @@ GameObject:
   - component: {fileID: 365322960}
   - component: {fileID: 365322959}
   m_Layer: 5
-  m_Name: Dropdown SceneName
+  m_Name: Dropdown SceneID
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4224,11 +4224,11 @@ MonoBehaviour:
   chatTextField: {fileID: 1959587314}
   chatInputField: {fileID: 1801311394}
   gamesList: []
-  sceneName: SuperAwesomeGame
+  sceneID: 0
   gameName: InsightExample
-  gameType: Practice
-  serverRegion: US
-  dropdownSceneName: {fileID: 365322959}
+  gameType: 0
+  serverRegion: 0
+  dropdownSceneID: {fileID: 365322959}
   dropdownGameType: {fileID: 699641825}
   dropdownServerRegion: {fileID: 899816526}
 --- !u!114 &1365284629

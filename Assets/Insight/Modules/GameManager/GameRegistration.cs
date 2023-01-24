@@ -11,7 +11,7 @@ namespace Insight
         Transport networkManagerTransport;
 
         //Pulled from command line arguments
-        public string GameScene;
+        public int GameSceneID;
         public string NetworkAddress;
         public ushort NetworkPort;
         public string UniqueID;
@@ -23,7 +23,7 @@ namespace Insight
         public bool JoinAnyTime;
 
         public string GameName;
-        public string GameType;
+        public int GameType;
 
         private bool AbortRun = false;
 
@@ -88,6 +88,15 @@ namespace Insight
 
         void GatherCmdArgs()
         {
+            if (NetworkManager.singleton == null)
+                Debug.Log("NULL NM");
+            if (InsightClient.instance == null)
+                Debug.Log("NULL IC");
+            if (InsightClient.instance.gameSettingsModule == null)
+                Debug.Log("NULL GM");
+            if (InsightClient.instance.gameSettingsModule.verifiedScenes == null || InsightClient.instance.gameSettingsModule.verifiedScenes.Length <= 0)
+                Debug.Log("NULL VS");
+
             InsightArgs args = new InsightArgs();
             if (args.IsProvided("-NetworkAddress"))
             {
@@ -117,45 +126,30 @@ namespace Insight
                     SetPort(networkManagerTransport, NetworkPort);
                 }
             }
-
-            if (args.IsProvided("-SceneName"))
+            
+            if (args.IsProvided("-SceneID"))
             {
                 if (InsightClient.instance.NoisyLogs)
-                    Debug.Log("[Args] - SceneName: " + args.SceneName);
-                
-                // if no scenes registered for client control verification, presume no scene switch
-                if (client.gameSettingsModule.verifiedScenesNames.Length > 0)
+                    Debug.Log("[Args] - SceneID: " + args.SceneID);
+
+                // check server has a scene for requested id
+                if (client.gameSettingsModule.verifiedScenes.Length >= 0 && args.SceneID < client.gameSettingsModule.verifiedScenes.Length)
                 {
-                    foreach (string _sceneName in client.gameSettingsModule.verifiedScenesNames)
-                    {
-                        if (_sceneName == args.SceneName)
-                        {
-                            if (InsightClient.instance.NoisyLogs)
-                                Debug.Log("[Args] - Scene found/verified.");
-                            GameScene = args.SceneName;
-                            SceneManager.LoadScene(GameScene);
-                        }
-                        else
-                        {
-                            Debug.LogWarning("[Args] - Scene not found/verified.");
-                            // if no matches, you could go to a verified scene, or stay on current scene
-                            //GameScene = verifiedScenes[0];
-                        }
-                    }
+
+                    if (InsightClient.instance.NoisyLogs)
+                        Debug.Log("[Args] - Scene found/verified.");
+                    GameSceneID = args.SceneID;
                 }
                 else
                 {
-                    //What to do if no verified scenes added in inspector, carry on or..Debug.LogWarning("[Args] - No scenes in verified array.");
-                    //AbortRun = true;
-
-                    // or do default behaviour of older insight, accept client sent scene string and try to load
-                    GameScene = args.SceneName;
-                    //SceneManager.LoadScene(GameScene);
+                    Debug.LogWarning("[Args] - Scene not found/verified.");
                 }
-                
-                NetworkManager.singleton.onlineScene = GameScene;
-            }
 
+                NetworkManager.singleton.onlineScene = client.gameSettingsModule.verifiedScenes[GameSceneID];
+            }
+            
+           
+           // NetworkManager.singleton.onlineScene = InsightClient.instance.gameSettingsModule.verifiedScenes[GameSceneID];
             if (args.IsProvided("-UniqueID"))
             {
                 if (InsightClient.instance.NoisyLogs)
@@ -169,6 +163,7 @@ namespace Insight
                     Debug.Log("[Args] - JoinAnyTime: " + args.JoinAnyTime);
                 JoinAnyTime = args.JoinAnyTime;
             }
+            
             if (args.IsProvided("-GameName"))
             {
                 if (InsightClient.instance.NoisyLogs)
@@ -181,7 +176,7 @@ namespace Insight
                     Debug.Log("[Args] - GameType: " + args.GameType);
                 GameType = args.GameType;
             }
-
+            
             MaxPlayers = NetworkManager.singleton.maxConnections;
 
             if (AbortRun == true)
@@ -222,13 +217,13 @@ namespace Insight
                 NetworkAddress = NetworkAddress,
                 NetworkPort = NetworkPort,
                 UniqueID = UniqueID,
-                SceneName = GameScene,
+                SceneID = GameSceneID,
                 MaxPlayers = MaxPlayers,
                 CurrentPlayers = CurrentPlayers,
                 JoinAnyTime = JoinAnyTime,
                 GameName = GameName,
                 GameType = GameType
-    });
+            });
         }
 
         void SendGameStatusToGameManager()

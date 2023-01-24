@@ -20,7 +20,7 @@ namespace Insight
             NetworkAddress = ExtractValue(Names.NetworkAddress, "localhost");
             NetworkPort = ExtractValueInt(Names.NetworkPort, 7777);
             UniqueID = ExtractValue(Names.UniqueID, "");
-            SceneName = ExtractValue(Names.SceneName, "");
+            SceneID = ExtractValueInt(Names.SceneID, 0);
             FrameRate = ExtractValueInt(Names.FrameRate, 30);
             ProcessName = ExtractValue(Names.ProcessName, "GameServer.exe");
             ProcessesMax = ExtractValueInt(Names.ProcessesMax, 5);
@@ -30,14 +30,14 @@ namespace Insight
             ServerID = ExtractValue(Names.ServerID, "");
             JoinAnyTime = ExtractValueBool(Names.JoinAnyTime, false);
             GameName = ExtractValue(Names.GameName, "");
-            GameType = ExtractValue(Names.GameType, "");
+            GameType = ExtractValueInt(Names.GameType, 0);
         }
 
         #region Arguments
         public string NetworkAddress { get; private set; } // example, 123.1.1.1
         public int NetworkPort { get; private set; } // example, 7777
         public string UniqueID { get; private set; } // ignore, auto set for spawned GameServers
-        public string SceneName { get; private set; } // example, Map2
+        public int SceneID { get; private set; } // example, Map2
         public int FrameRate { get; private set; } // example, 30
         public string ProcessName { get; private set; } // example. GameServer.exe
         public int ProcessesMax { get; private set; } // amount of GameServers per VPS Spawner, example, 5
@@ -47,7 +47,7 @@ namespace Insight
         public string ServerID { get; private set; } // future use for api or invite codes
         public bool JoinAnyTime { get; private set; } // allow joining of gamese in progress
         public string GameName { get; private set; } // name of your game
-        public string GameType { get; private set; } // example, 1 = free for all, 2 deathmatch
+        public int GameType { get; private set; } // example, 1 = free for all, 2 deathmatch
         #endregion
 
         #region Helper methods
@@ -84,7 +84,7 @@ namespace Insight
             public string NetworkAddress { get { return "-NetworkAddress"; } }
             public string NetworkPort { get { return "-NetworkPort"; } }
             public string UniqueID { get { return "-UniqueID"; } }
-            public string SceneName { get { return "-SceneName"; } }
+            public string SceneID { get { return "-SceneID"; } }
             public string FrameRate { get { return "-FrameRate"; } }
             public string ProcessName { get { return "-ProcessName"; } }
             public string ProcessesMax { get { return "-ProcessesMax"; } }

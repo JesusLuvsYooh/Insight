@@ -55,7 +55,7 @@ MonoBehaviour:
   AuthClientUponConnect: 0
   NoisyLogs: 1
   clientAuthentication: {fileID: 0}
-  gameSettingsModule: {fileID: 0}
+  gameSettingsModule: {fileID: 5726541904148818591}
   ReconnectDelayInSeconds: 5
 --- !u!114 &114092492723764628
 MonoBehaviour:
@@ -155,7 +155,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72fd0eb9c3a916a42b979bafd1098e66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GameScene: 
+  GameSceneID: 0
   NetworkAddress: 
   NetworkPort: 0
   UniqueID: 
@@ -163,7 +163,7 @@ MonoBehaviour:
   CurrentPlayers: 0
   JoinAnyTime: 0
   GameName: 
-  GameType: 
+  GameType: 0
 --- !u!1 &1030115387926320301
 GameObject:
   m_ObjectHideFlags: 0
@@ -283,3 +283,15 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 8557733340392018956}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &5726541904148818591 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4160181071779511955, guid: 556f85abe84774588a6b159e1fe3d7a9,
+    type: 3}
+  m_PrefabInstance: {fileID: 8557733340392018956}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a596511d75934602b1d3218bc918f21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

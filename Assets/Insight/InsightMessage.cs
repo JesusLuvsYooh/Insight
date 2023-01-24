@@ -10,7 +10,7 @@ namespace Insight
 
     public class PropertiesMsg : Message
     {
-        public string SceneName;
+        public int SceneID;
         public string GameType;
         public int MaxPlayers;
         public bool IsPublic;
@@ -62,12 +62,12 @@ namespace Insight
         public string UniqueID; //Guid
         public string NetworkAddress;
         public ushort NetworkPort;
-        public string SceneName;
+        public int SceneID;
         public int MaxPlayers;
         public int CurrentPlayers;
         public bool JoinAnyTime;
         public string GameName;
-        public string GameType;
+        public int GameType;
     }
 
     public class GameStatusMsg : Message
@@ -79,7 +79,7 @@ namespace Insight
     //Sent when requesting a new GameServer to be created running the provided scene.
     public class RequestSpawnStartMsg : Message
     {
-        public string SceneName;
+        public int SceneID;
 
         //Only valid in the reply from the spawner. So it should be moved to another message
         public string UniqueID; //Guid
@@ -87,7 +87,7 @@ namespace Insight
         public string JoinAnyTime;
 
         public string GameName;
-        public string GameType;
+        public int GameType;
 
     }
 
@@ -106,9 +106,9 @@ namespace Insight
     //Sent from a player client when they wants to join a matchmaking playlist
     public class StartMatchMakingMsg : Message
     {
-        public string SceneName;
+        public int SceneID;
         public string GameName;
-        public string GameType;
+        public int GameType;
     }
 
     //Sent from a player client when they want to quit matchmaking
@@ -146,7 +146,7 @@ namespace Insight
         //This is msg would not support all transports in its current configuration.
         public string NetworkAddress;
         public ushort NetworkPort;
-        public string SceneName;
+        public int SceneID;
     }
 
     //Updates the MasterSpawner with current status of the spawner

@@ -1,5 +1,6 @@
 ﻿using Mirror;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -40,13 +41,13 @@ namespace Insight.Examples
         public List<GameContainer> gamesList = new List<GameContainer>();
 
         [Header("Playlist/Game Name")]
-        public string sceneName = "SuperAwesomeGame";
+        public int sceneID = 0;
         public string gameName = "InsightExample"; // no spaces, think of it as an ID 
-        public string gameType = "Practice";
-        public string serverRegion = "Practice";
+        public int gameType = 0;
+        public int serverRegion = 0;
 
         [Header("Matchmaking Options")]
-        public Dropdown dropdownSceneName;
+        public Dropdown dropdownSceneID;
         public Dropdown dropdownGameType;
         public Dropdown dropdownServerRegion;
 
@@ -133,7 +134,7 @@ namespace Insight.Examples
             StartMatchMakingButton.SetActive(false);
             StopMatchMakingButton.SetActive(true);
 
-            matchComp.SendStartMatchMaking(new StartMatchMakingMsg() { SceneName = sceneName, GameName = gameName, GameType = gameType });
+            matchComp.SendStartMatchMaking(new StartMatchMakingMsg() { SceneID = sceneID, GameName = gameName, GameType = gameType });
         }
 
         public void HandleStopMatchMakingButton()
@@ -181,7 +182,7 @@ namespace Insight.Examples
 
         public void HandleCreateGameButton()
         {
-            gameComp.SendRequestSpawnStart(new RequestSpawnStartMsg() { SceneName = sceneName, GameName = gameName, GameType = gameType });
+            gameComp.SendRequestSpawnStart(new RequestSpawnStartMsg() { SceneID = sceneID, GameName = gameName, GameType = gameType });
         }
 
         public void HandleSendChatButton()
@@ -218,7 +219,7 @@ namespace Insight.Examples
                 comp.UniqueID = game.UniqueId;
                 comp.CurrentPlayers = game.CurrentPlayers;
                 comp.MaxPlayers = game.MaxPlayers;
-                comp.SceneName = game.SceneName;
+                comp.SceneID = game.SceneID;
                 comp.JoinAnyTime = game.JoinAnyTime;
                 comp.GameName = game.GameName;
                 comp.GameType = game.GameType;
@@ -227,19 +228,18 @@ namespace Insight.Examples
 
         void SetupMatchMakingSettings()
         {
-            dropdownSceneName.options.Clear();
-            List<string> listOfSceneName = new List<string>();
-            foreach (var value in InsightClient.instance.gameSettingsModule.verifiedScenesNames)
+            dropdownSceneID.options.Clear();
+            List<string> listOfSceneID = new List<string>();
+            foreach (var value in InsightClient.instance.gameSettingsModule.verifiedScenes)
             {
-                listOfSceneName.Add(value.ToString());
+                listOfSceneID.Add(Path.GetFileNameWithoutExtension(value));
             }
-            foreach (var _sceneName in listOfSceneName)
+            foreach (var _sceneID in listOfSceneID)
             {
-                dropdownSceneName.options.Add(new Dropdown.OptionData() { text = _sceneName });
+                dropdownSceneID.options.Add(new Dropdown.OptionData() { text = _sceneID });
             }
-            dropdownSceneName.captionText.text = listOfSceneName[0];
-            DropdownSelectedSceneName(dropdownSceneName);
-            dropdownSceneName.onValueChanged.AddListener(delegate { DropdownSelectedSceneName(dropdownSceneName); });
+            DropdownSelectedSceneID(dropdownSceneID);
+            dropdownSceneID.onValueChanged.AddListener(delegate { DropdownSelectedSceneID(dropdownSceneID); });
 
 
             dropdownGameType.options.Clear();
@@ -252,7 +252,6 @@ namespace Insight.Examples
             {
                 dropdownGameType.options.Add(new Dropdown.OptionData() { text = _gameType });
             }
-            dropdownGameType.captionText.text = listOfGameType[0];
             DropdownSelectedGameType(dropdownGameType);
             dropdownGameType.onValueChanged.AddListener(delegate { DropdownSelectedGameType(dropdownGameType); });
            
@@ -267,27 +266,26 @@ namespace Insight.Examples
             {
                 dropdownServerRegion.options.Add(new Dropdown.OptionData() { text = _serverRegion });
             }
-            dropdownServerRegion.captionText.text = listOfServerRegion[0];
             DropdownSelectedServerRegion(dropdownServerRegion);
             dropdownServerRegion.onValueChanged.AddListener(delegate { DropdownSelectedServerRegion(dropdownServerRegion); });
         }
 
-        void DropdownSelectedSceneName(Dropdown _dropdown)
+        void DropdownSelectedSceneID(Dropdown _dropdown)
         {
             int index = _dropdown.value;
-            sceneName = _dropdown.options[index].text;
+            sceneID = _dropdown.value;
         }
 
         void DropdownSelectedGameType(Dropdown _dropdown)
         {
             int index = _dropdown.value;
-            gameType = _dropdown.options[index].text;
+            gameType = _dropdown.value;
         }
 
         void DropdownSelectedServerRegion(Dropdown _dropdown)
         {
             int index = _dropdown.value;
-            serverRegion = _dropdown.options[index].text;
+            serverRegion = _dropdown.value;
         }
 
     }

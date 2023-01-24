@@ -8,7 +8,7 @@ namespace Insight
     {
         InsightClient client;
 
-        [Scene] public string[] verifiedScenesNames;
+        [Scene] public string[] verifiedScenes;
         public string[] verifiedGameTypes;
         public string[] verifiedServerRegions;
 
