@@ -134,7 +134,7 @@ namespace Insight.Examples
             StartMatchMakingButton.SetActive(false);
             StopMatchMakingButton.SetActive(true);
 
-            matchComp.SendStartMatchMaking(new StartMatchMakingMsg() { SceneID = sceneID, GameName = gameName, GameType = gameType });
+            matchComp.SendStartMatchMaking(new StartMatchMakingMsg() { SceneID = sceneID, GameName = gameName, GameType = gameType, ServerRegion = serverRegion });
         }
 
         public void HandleStopMatchMakingButton()
@@ -182,7 +182,7 @@ namespace Insight.Examples
 
         public void HandleCreateGameButton()
         {
-            gameComp.SendRequestSpawnStart(new RequestSpawnStartMsg() { SceneID = sceneID, GameName = gameName, GameType = gameType });
+            gameComp.SendRequestSpawnStart(new RequestSpawnStartMsg() { SceneID = sceneID, GameName = gameName, GameType = gameType, ServerRegion = serverRegion });
         }
 
         public void HandleSendChatButton()

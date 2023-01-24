@@ -24,6 +24,7 @@ namespace Insight
 
         public string GameName;
         public int GameType;
+        public int ServerRegion;
 
         private bool AbortRun = false;
 
@@ -176,7 +177,13 @@ namespace Insight
                     Debug.Log("[Args] - GameType: " + args.GameType);
                 GameType = args.GameType;
             }
-            
+            if (args.IsProvided("-ServerRegion"))
+            {
+                if (InsightClient.instance.NoisyLogs)
+                    Debug.Log("[Args] - ServerRegion: " + args.ServerRegion);
+                ServerRegion = args.ServerRegion;
+            }
+
             MaxPlayers = NetworkManager.singleton.maxConnections;
 
             if (AbortRun == true)
@@ -222,7 +229,8 @@ namespace Insight
                 CurrentPlayers = CurrentPlayers,
                 JoinAnyTime = JoinAnyTime,
                 GameName = GameName,
-                GameType = GameType
+                GameType = GameType,
+                ServerRegion = ServerRegion
             });
         }
 

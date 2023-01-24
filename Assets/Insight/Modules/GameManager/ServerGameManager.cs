@@ -52,6 +52,7 @@ namespace Insight
                 JoinAnyTime = message.JoinAnyTime,
                 GameName = message.GameName,
                 GameType = message.GameType,
+                ServerRegion = message.ServerRegion,
 
                 connectionId = netMsg.connectionId
             });
@@ -166,5 +167,6 @@ namespace Insight
         public bool JoinAnyTime;
         public string GameName;
         public int GameType;
+        public int ServerRegion;
     }
 }

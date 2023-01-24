@@ -35,8 +35,9 @@ namespace Insight
 
         private int sceneID = 0;
         private string joinAnyTime = "false";
-        private string gameName = "InsightExample";
+        private string gameName = "InsightExample"; // or use this as an ID, if you want multiple build splits per master server
         private int gameType = 0;
+        private int serverRegion = 0;
 
         public void Awake()
         {
@@ -81,9 +82,10 @@ namespace Insight
             sceneID = message.SceneID;
             gameName = message.GameName;
             gameType = message.GameType;
+            serverRegion = message.ServerRegion;
 
             if (InsightServer.instance.NoisyLogs)
-                Debug.Log("[MatchMaking] - Client data received: " + sceneID + " -  " + gameName + " - " + gameType);
+                Debug.Log("[MatchMaking] - Client data received: " + sceneID + " -  " + gameName + " - " + gameType + " - " + serverRegion);
 
             netMsg.Reply(new MatchMakingResponseMsg()
             {
@@ -243,7 +245,8 @@ namespace Insight
                 UniqueID = uniqueID,
                 JoinAnyTime = joinAnyTime,
                 GameName = gameName,
-                GameType = gameType
+                GameType = gameType,
+                ServerRegion = serverRegion
             };
 
             List<UserContainer> matchUsers = new List<UserContainer>();

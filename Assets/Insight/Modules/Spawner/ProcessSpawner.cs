@@ -219,7 +219,8 @@ namespace Insight
                     UniqueID = message.UniqueID,
                     JoinAnyTime = message.JoinAnyTime,
                     GameName = message.GameName,
-                    GameType = message.GameType
+                    GameType = message.GameType,
+                    ServerRegion = message.ServerRegion
                 });
             }
         }
@@ -345,6 +346,7 @@ namespace Insight
                     Debug.Log("[ProcessSpawner] - Scene name was not provided for spawn.");
                 return false;
             }
+            //region
             */
             Process p = new Process();
             // Put the process path and the process name together. We use
@@ -359,7 +361,8 @@ namespace Insight
                 " -UniqueID " + spawnProperties.UniqueID + //What to do if the UniqueID or any other value is null??
                 " -JoinAnyTime " + spawnProperties.JoinAnyTime +
                 " -GameName " + spawnProperties.GameName +
-                " -GameType " + spawnProperties.GameType;
+                " -GameType " + spawnProperties.GameType +
+                " -ServerRegion " + spawnProperties.ServerRegion;
 
             if (System.IO.File.Exists(p.StartInfo.FileName))
             {

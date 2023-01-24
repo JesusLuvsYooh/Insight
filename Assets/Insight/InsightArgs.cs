@@ -31,6 +31,7 @@ namespace Insight
             JoinAnyTime = ExtractValueBool(Names.JoinAnyTime, false);
             GameName = ExtractValue(Names.GameName, "");
             GameType = ExtractValueInt(Names.GameType, 0);
+            ServerRegion = ExtractValueInt(Names.ServerRegion, 0);
         }
 
         #region Arguments
@@ -48,6 +49,7 @@ namespace Insight
         public bool JoinAnyTime { get; private set; } // allow joining of gamese in progress
         public string GameName { get; private set; } // name of your game
         public int GameType { get; private set; } // example, 1 = free for all, 2 deathmatch
+        public int ServerRegion { get; private set; } // example, 1 = US
         #endregion
 
         #region Helper methods
@@ -95,6 +97,7 @@ namespace Insight
             public string JoinAnyTime { get { return "-JoinAnyTime"; } }
             public string GameName { get { return "-GameName"; } }
             public string GameType { get { return "-GameType"; } }
+            public string ServerRegion { get { return "-ServerRegion"; } }
         }
     }
 }

@@ -12,6 +12,7 @@ namespace Insight
         public int SceneID;
         public string GameName;
         public int GameType;
+        public int ServerRegion;
 
         public List<GameContainer> gamesList = new List<GameContainer>();
 
@@ -87,7 +88,8 @@ namespace Insight
                     MinPlayers = game.MinPlayers,
                     JoinAnyTime = game.JoinAnyTime,
                     GameName = game.GameName,
-                    GameType = game.GameType
+                    GameType = game.GameType,
+                    ServerRegion = game.ServerRegion
                 });
             }
         }

@@ -68,6 +68,7 @@ namespace Insight
         public bool JoinAnyTime;
         public string GameName;
         public int GameType;
+        public int ServerRegion;
     }
 
     public class GameStatusMsg : Message
@@ -88,6 +89,7 @@ namespace Insight
 
         public string GameName;
         public int GameType;
+        public int ServerRegion;
 
     }
 
@@ -109,6 +111,7 @@ namespace Insight
         public int SceneID;
         public string GameName;
         public int GameType;
+        public int ServerRegion;
     }
 
     //Sent from a player client when they want to quit matchmaking
