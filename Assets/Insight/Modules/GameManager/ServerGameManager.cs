@@ -105,6 +105,18 @@ namespace Insight
             GameListMsg gamesListMsg = new GameListMsg();
             gamesListMsg.Load(registeredGameServers);
 
+            if (server.gameSettingsModule.StripConnectionInfo)
+            {
+                foreach (GameContainer game in gamesListMsg.gamesArray)
+                {
+                    if (game.JoinAnyTime == false || game.CurrentPlayers >= game.MaxPlayers)
+                    {
+                        game.NetworkAddress = "";
+                        game.NetworkPort = 0;
+                    }
+                }
+            }
+
             netMsg.Reply(gamesListMsg);
         }
 
@@ -135,6 +147,7 @@ namespace Insight
         //Used by MatchMaker to request a GameServer for a new Match
         public void RequestGameSpawnStart(RequestSpawnStartMsg requestSpawn)
         {
+            //Debug.LogWarning("RequestGameSpawnStart: " + requestSpawn.ServerRegion);
             masterSpawner.InternalSpawnRequest(requestSpawn);
         }
 

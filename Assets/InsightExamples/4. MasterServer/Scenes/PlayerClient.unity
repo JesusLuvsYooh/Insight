@@ -287,8 +287,8 @@ RectTransform:
   - {fileID: 365322958}
   - {fileID: 699641824}
   - {fileID: 899816525}
-  m_Father: {fileID: 1496749888}
-  m_RootOrder: 5
+  m_Father: {fileID: 1635566047}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -4213,6 +4213,7 @@ MonoBehaviour:
   chatComp: {fileID: 1750788654}
   gameComp: {fileID: 831476772}
   matchComp: {fileID: 650334111}
+  gameSettingsModule: {fileID: 977220134733452679}
   StartMatchMakingButton: {fileID: 1635566046}
   StopMatchMakingButton: {fileID: 858910305}
   GetGameListButton: {fileID: 596783715}
@@ -4920,7 +4921,6 @@ RectTransform:
   - {fileID: 858910306}
   - {fileID: 9236044}
   - {fileID: 547811547}
-  - {fileID: 19450970}
   m_Father: {fileID: 1365284632}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5272,6 +5272,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 343279977}
+  - {fileID: 19450970}
   m_Father: {fileID: 1496749888}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -7563,3 +7564,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 936345dc85da8084b8903c7474dc155c, type: 3}
+--- !u!114 &977220134733452679 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5376158148745602388, guid: 936345dc85da8084b8903c7474dc155c,
+    type: 3}
+  m_PrefabInstance: {fileID: 977220134733452678}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a596511d75934602b1d3218bc918f21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

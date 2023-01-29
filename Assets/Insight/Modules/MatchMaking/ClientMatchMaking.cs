@@ -51,6 +51,9 @@ namespace Insight
                 case MatchMakingResponseType.Failed:
                 status = "MatchMaking failed!";
                 break;
+                case MatchMakingResponseType.NoMatch:
+                status = "No Matching matches.";
+                break;
             }
             Debug.Log("[MatchMakingResponse] " + status);
             OnMatchMakingChange?.Invoke((MatchMakingResponseType)message.ResponseType, status);

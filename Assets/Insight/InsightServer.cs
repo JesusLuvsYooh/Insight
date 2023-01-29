@@ -19,6 +19,7 @@ namespace Insight
         public Dictionary<int, InsightNetworkConnection> connections = new Dictionary<int, InsightNetworkConnection>();
         protected List<SendToAllFinishedCallbackData> sendToAllFinishedCallbacks = new List<SendToAllFinishedCallbackData>();
         public ServerAuthentication serverAuthentication;
+        public InsightGameSettings gameSettingsModule;
 
         public override void Awake()
         {

@@ -28,7 +28,7 @@ namespace Insight
             PlayersMax = ExtractValueInt(Names.PlayersMax, 100);
             NoisyLogs = ExtractValueBool(Names.NoisyLogs, true);
             ServerID = ExtractValue(Names.ServerID, "");
-            JoinAnyTime = ExtractValueBool(Names.JoinAnyTime, false);
+            JoinAnyTime = ExtractValue(Names.JoinAnyTime, "0");
             GameName = ExtractValue(Names.GameName, "");
             GameType = ExtractValueInt(Names.GameType, 0);
             ServerRegion = ExtractValueInt(Names.ServerRegion, 0);
@@ -46,7 +46,7 @@ namespace Insight
         public int PlayersMax { get; private set; } // max connections per spawned GameServer, example, 50
         public bool NoisyLogs { get; private set; } // for debugging, on/off, example, on
         public string ServerID { get; private set; } // future use for api or invite codes
-        public bool JoinAnyTime { get; private set; } // allow joining of gamese in progress
+        public string JoinAnyTime { get; private set; } // allow joining of gamese in progress
         public string GameName { get; private set; } // name of your game
         public int GameType { get; private set; } // example, 1 = free for all, 2 deathmatch
         public int ServerRegion { get; private set; } // example, 1 = US

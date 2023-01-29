@@ -318,7 +318,7 @@ namespace Insight
             
             if (string.IsNullOrEmpty(spawnProperties.JoinAnyTime))
             {
-                spawnProperties.JoinAnyTime = "false";
+                spawnProperties.JoinAnyTime = "0";
 
                 if (NoisyLogs)
                     Debug.Log("[ProcessSpawner] - JoinAnyTime was not provided for spawn.");

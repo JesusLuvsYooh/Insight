@@ -22,6 +22,7 @@ namespace Insight.Examples
         public ChatClient chatComp;
         public ClientGameManager gameComp;
         public ClientMatchMaking matchComp;
+        public InsightGameSettings gameSettingsModule;
 
         [Header("UI Buttons")]
         public GameObject StartMatchMakingButton;
@@ -223,6 +224,7 @@ namespace Insight.Examples
                 comp.JoinAnyTime = game.JoinAnyTime;
                 comp.GameName = game.GameName;
                 comp.GameType = game.GameType;
+                comp.Region = game.ServerRegion;
             }
         }
 

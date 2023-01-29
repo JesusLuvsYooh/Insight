@@ -55,8 +55,8 @@ MonoBehaviour:
   networkAddress: localhost
   AuthClientUponConnect: 0
   NoisyLogs: 1
-  clientAuthentication: {fileID: 0}
-  gameSettingsModule: {fileID: 0}
+  clientAuthentication: {fileID: 977220134091069447}
+  gameSettingsModule: {fileID: 5376158148745602388}
   ReconnectDelayInSeconds: 5
 --- !u!114 &977220133108369792
 MonoBehaviour:
@@ -187,9 +187,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db76fd5d613c6b44ea218eb1c4c6acde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SceneName: 
+  SceneID: 0
   GameName: 
-  GameType: 
+  GameType: 0
+  ServerRegion: 0
   gamesList: []
 --- !u!1 &977220134091069689
 GameObject:
@@ -353,3 +354,15 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 8295663492538899399}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &5376158148745602388 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4160181071779511955, guid: 556f85abe84774588a6b159e1fe3d7a9,
+    type: 3}
+  m_PrefabInstance: {fileID: 8295663492538899399}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a596511d75934602b1d3218bc918f21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

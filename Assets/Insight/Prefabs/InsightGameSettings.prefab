@@ -43,14 +43,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a596511d75934602b1d3218bc918f21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  JoinAnyTime: 1
+  StripConnectionInfo: 1
   verifiedScenes:
-  - Assets/InsightExamples/4. MasterServer/Scenes/SuperAwesomeGame.unity
-  - Assets/InsightExamples/4. MasterServer/Scenes/GreatGoodMap.unity
+  - Any
+  - SuperAwesomeGame
+  - GreatGoodMap
   verifiedGameTypes:
+  - Any
   - Practice
   - Deathmatch
   - Battle Royale
   verifiedServerRegions:
+  - Any
   - US
   - EU
   - Asia

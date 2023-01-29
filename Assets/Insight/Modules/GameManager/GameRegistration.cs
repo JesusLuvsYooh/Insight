@@ -42,7 +42,8 @@ namespace Insight
             networkManagerTransport = Transport.activeTransport;
 
 #endif
-
+            // use Game Settings master bool, can be overrided by args
+            JoinAnyTime = client.gameSettingsModule.JoinAnyTime;
             //networkManagerTransport.OnServerDisconnected = OnServerDisconnect;
             //networkManagerTransport.OnServerConnected = OnServerCconnected;
 
@@ -133,8 +134,10 @@ namespace Insight
                 if (InsightClient.instance.NoisyLogs)
                     Debug.Log("[Args] - SceneID: " + args.SceneID);
 
+                int buildIndex = SceneUtility.GetBuildIndexByScenePath(client.gameSettingsModule.verifiedScenes[GameSceneID]);
+
                 // check server has a scene for requested id
-                if (client.gameSettingsModule.verifiedScenes.Length >= 0 && args.SceneID < client.gameSettingsModule.verifiedScenes.Length)
+                if (buildIndex >= 0 && client.gameSettingsModule.verifiedScenes.Length >= 0 && args.SceneID < client.gameSettingsModule.verifiedScenes.Length)
                 {
 
                     if (InsightClient.instance.NoisyLogs)
@@ -143,9 +146,10 @@ namespace Insight
                 }
                 else
                 {
-                    Debug.LogWarning("[Args] - Scene not found/verified.");
+                    Debug.Log("[Args] - Scene not found/verified or any Scene is desired.");
+                    // Presuming "Any" or "0" has been selected, chose a random one from list?
+                    GameSceneID = UnityEngine.Random.Range(1, client.gameSettingsModule.verifiedScenes.Length);
                 }
-
                 NetworkManager.singleton.onlineScene = client.gameSettingsModule.verifiedScenes[GameSceneID];
             }
             
@@ -162,7 +166,10 @@ namespace Insight
             {
                 if (InsightClient.instance.NoisyLogs)
                     Debug.Log("[Args] - JoinAnyTime: " + args.JoinAnyTime);
-                JoinAnyTime = args.JoinAnyTime;
+                if (args.JoinAnyTime == "true" || args.JoinAnyTime == "True")
+                {
+                    JoinAnyTime = true;
+                }
             }
             
             if (args.IsProvided("-GameName"))

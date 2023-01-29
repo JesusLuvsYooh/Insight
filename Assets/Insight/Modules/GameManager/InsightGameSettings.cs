@@ -1,4 +1,4 @@
-using Mirror;
+//using Mirror;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -8,7 +8,12 @@ namespace Insight
     {
         InsightClient client;
 
-        [Scene] public string[] verifiedScenes;
+        public bool JoinAnyTime;
+        [Tooltip("True strips out IP and Port from Games List sent to clients, if that server is not connectable. Full/Private/JoinAnyTime(false).")]
+        public bool StripConnectionInfo;
+
+        //[Scene] public string[] verifiedScenes;
+        public string[] verifiedScenes;
         public string[] verifiedGameTypes;
         public string[] verifiedServerRegions;
 

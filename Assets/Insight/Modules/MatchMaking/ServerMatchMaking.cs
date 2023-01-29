@@ -1,6 +1,7 @@
 using Mirror;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 //TODO: Remove the example specific code from module
@@ -14,7 +15,8 @@ namespace Insight
         Full, //full spwaners
         Join, //gameserver starts, moving player to server
         Timeout, //players not found
-        Failed //gameserver timeout
+        Failed, //gameserver timeout
+        NoMatch //no matching filter servers
     }
 
     public class ServerMatchMaking : InsightModule
@@ -26,10 +28,13 @@ namespace Insight
 
         public int MinimumPlayersForGame = 1;
         public float MatchMakingPollRate = 10f;
-        
+
 
         public List<UserContainer> playerQueue = new List<UserContainer>();
         public List<MatchContainer> matchList = new List<MatchContainer>();
+
+        public List<GameContainer> filteredGameServers = new List<GameContainer>();
+        public List<GameContainer> sortedGameServers = new List<GameContainer>();
 
         bool _spawnInProgress;
 
@@ -87,73 +92,75 @@ namespace Insight
             if (InsightServer.instance.NoisyLogs)
                 Debug.Log("[MatchMaking] - Client data received: " + sceneID + " -  " + gameName + " - " + gameType + " - " + serverRegion);
 
-            netMsg.Reply(new MatchMakingResponseMsg()
+            // should never happen
+            if (masterSpawner.registeredSpawners.Count == 0)
             {
-                ResponseType = (ushort)MatchMakingResponseType.Search
-            });
+                Debug.LogError("[MatchMaking] - No Spawners, cannot continue!");
 
-            // temp check, needs to cycle through all spawners and gameservers
-            if (joinAnyTime == "false" || joinAnyTime == "False")
+                netMsg.Reply(new MatchMakingResponseMsg() { ResponseType = MatchMakingResponseType.Failed });
+            }
+            // no servers to search or filter, queue player which will create new gameserver
+            else if (gameManager.registeredGameServers.Count == 0)
             {
-                playerQueue.Add(authModule.GetUserByConnection(netMsg.connectionId));
-                netMsg.Reply(new MatchMakingResponseMsg()
-                {
-                    ResponseType = MatchMakingResponseType.Wait
-                });
+                if (InsightServer.instance.NoisyLogs)
+                    Debug.Log("[MatchMaking] - No GameServers.");
+                AddPlayerToGameServerQueue(netMsg);
             }
             else
             {
-                if (masterSpawner.registeredSpawners.Count == 0 || gameManager.registeredGameServers.Count == 0)
-                {
-                    //if (InsightServer.instance.NoisyLogs)
-                    Debug.Log("[MatchMaking] - No spawners or servers, queuing player.");
-                    playerQueue.Add(authModule.GetUserByConnection(netMsg.connectionId));
-                    netMsg.Reply(new MatchMakingResponseMsg()
-                    {
-                        ResponseType = MatchMakingResponseType.Failed
-                    });
-                }
-                else
-                {
-                    SearchForServerSpaces(netMsg);
-                }
+                SearchForServers(netMsg);
             }
         }
 
-        void SearchForServerSpaces(InsightNetworkMessage netMsg)
+        void SearchForServers(InsightNetworkMessage netMsg)
         {
             GameContainer game = null;
-            
+            game = gameManager.registeredGameServers[0];
+            /*
 
-            foreach (GameContainer gameTemp in gameManager.registeredGameServers)
-            {
-                if (gameTemp.CurrentPlayers < gameTemp.MaxPlayers)
-                {
-                    game = gameTemp;
-                    if (InsightServer.instance.NoisyLogs)
-                        Debug.Log("[MatchMaking] - Game with space found.");
-                    netMsg.Reply(new MatchMakingResponseMsg()
-                    {
-                        ResponseType = MatchMakingResponseType.Join
-                    });
-                    break;
-                }
-            };
+            // clear our list, to apply matchmaking options
+            filteredGameServers.Clear();
+            sortedGameServers.Clear();
 
-            if (game == null)
+            sortedGameServers = gameManager.registeredGameServers.OrderBy(value => value.CurrentPlayers).ToList();
+
+            // filter games that do not let players join once started
+            //foreach (GameContainer gameTemp in sortedGameServers)
+            //{
+            //    if (gameTemp.JoinAnyTime == true)
+            //    {
+            //        filteredGameServers.Add(gameTemp);
+            //    }
+            //};
+
+            FilterForServerSpace(netMsg);
+
+            // you can reorganise these 3 to prioritise order 
+            FilterForServerRegion(netMsg);
+
+            FilterForServerGameType(netMsg);
+
+            FilterForServerSceneID(netMsg);
+
+            if (filteredGameServers != null && filteredGameServers.Count > 0)
             {
+                game = filteredGameServers[0];
+
                 if (InsightServer.instance.NoisyLogs)
-                Debug.Log("[MatchMaking] - No spaces queue player.");
-                playerQueue.Add(authModule.GetUserByConnection(netMsg.connectionId));
+                    Debug.Log("[MatchMaking] - Matching game found.");
+
                 netMsg.Reply(new MatchMakingResponseMsg()
                 {
-                    ResponseType = MatchMakingResponseType.Full
+                    ResponseType = MatchMakingResponseType.Join
                 });
             }
-            else
+            */
+
+
+            if (game != null)
             {
                 if (InsightServer.instance.NoisyLogs)
-                    Debug.Log("[MatchMaking] - Sending client to server.");
+                    Debug.Log("[MatchMaking] - Match found, sending data to client.");
 
                 netMsg.Reply(new ChangeServerMsg()
                 {
@@ -166,6 +173,139 @@ namespace Insight
                 {
                     authModule.registeredUsers.Remove(authModule.GetUserByConnection(netMsg.connectionId));
                     NetworkServer.RemoveConnection(netMsg.connectionId);
+                }
+            }
+            else if (game == null)
+            {
+                if (InsightServer.instance.NoisyLogs)
+                    Debug.Log("[MatchMaking] - No Matches from players filtered options.");
+                AddPlayerToGameServerQueue(netMsg);
+            }
+        }
+
+        void AddPlayerToGameServerQueue(InsightNetworkMessage netMsg)
+        {
+            if (InsightServer.instance.NoisyLogs)
+                Debug.Log("[MatchMaking] - Queue player for new GameServer spawn.");
+            playerQueue.Add(authModule.GetUserByConnection(netMsg.connectionId));
+            netMsg.Reply(new MatchMakingResponseMsg()
+            {
+                ResponseType = MatchMakingResponseType.Wait
+            });
+        }
+
+            void FilterForServerSpace(InsightNetworkMessage netMsg)
+        {
+            // filter regions if client has a prefered one selected
+            if (sortedGameServers != null && sortedGameServers.Count > 0)
+            {
+                filteredGameServers.Clear();
+                foreach (GameContainer gameTemp in sortedGameServers)
+                {
+                    if (gameTemp.CurrentPlayers < gameTemp.MaxPlayers)
+                    {
+                        filteredGameServers.Add(gameTemp);
+                    }
+                };
+
+                sortedGameServers = filteredGameServers;
+
+                if (filteredGameServers == null || filteredGameServers.Count <= 0)
+                {
+                    if (InsightServer.instance.NoisyLogs)
+                        Debug.Log("[MatchMaking] - No empty servers.");
+                    playerQueue.Add(authModule.GetUserByConnection(netMsg.connectionId));
+                    netMsg.Reply(new MatchMakingResponseMsg()
+                    {
+                        ResponseType = MatchMakingResponseType.Full
+                    });
+                }
+            }
+        }
+
+        void FilterForServerRegion(InsightNetworkMessage netMsg)
+        {
+            // filter regions if client has a prefered one selected
+            if (sortedGameServers != null && sortedGameServers.Count > 0 && serverRegion > 0)
+            {
+                filteredGameServers.Clear();
+                foreach (GameContainer gameTemp in sortedGameServers)
+                {
+                    if (gameTemp.ServerRegion == serverRegion)
+                    {
+                        filteredGameServers.Add(gameTemp);
+                    }
+                };
+
+                sortedGameServers = filteredGameServers;
+
+                if (filteredGameServers == null || filteredGameServers.Count <= 0)
+                {
+                    if (InsightServer.instance.NoisyLogs)
+                        Debug.Log("[MatchMaking] - No matching region servers.");
+                    playerQueue.Add(authModule.GetUserByConnection(netMsg.connectionId));
+                    netMsg.Reply(new MatchMakingResponseMsg()
+                    {
+                        ResponseType = MatchMakingResponseType.NoMatch
+                    });
+                }
+            }
+        }
+
+        void FilterForServerGameType(InsightNetworkMessage netMsg)
+        {
+            // filter game type if client has a prefered one selected
+            if (sortedGameServers != null && sortedGameServers.Count > 0 && gameType > 0)
+            {
+                filteredGameServers.Clear();
+                foreach (GameContainer gameTemp in sortedGameServers)
+                {
+                    if (gameTemp.GameType == gameType)
+                    {
+                        filteredGameServers.Add(gameTemp);
+                    }
+                };
+
+                sortedGameServers = filteredGameServers;
+
+                if (filteredGameServers == null || filteredGameServers.Count <= 0)
+                {
+                    if (InsightServer.instance.NoisyLogs)
+                        Debug.Log("[MatchMaking] - No matching game type servers.");
+                    playerQueue.Add(authModule.GetUserByConnection(netMsg.connectionId));
+                    netMsg.Reply(new MatchMakingResponseMsg()
+                    {
+                        ResponseType = MatchMakingResponseType.NoMatch
+                    });
+                }
+            }
+        }
+
+        void FilterForServerSceneID(InsightNetworkMessage netMsg)
+        {
+            // filter scene id if client has a prefered one selected
+            if (sortedGameServers != null && sortedGameServers.Count > 0 && sceneID >= 0)
+            {
+                filteredGameServers.Clear();
+                foreach (GameContainer gameTemp in sortedGameServers)
+                {
+                    if (gameTemp.SceneID == sceneID)
+                    {
+                        filteredGameServers.Add(gameTemp);
+                    }
+                };
+
+                sortedGameServers = filteredGameServers;
+
+                if (filteredGameServers == null || filteredGameServers.Count <= 0)
+                {
+                    if (InsightServer.instance.NoisyLogs)
+                        Debug.Log("[MatchMaking] - No matching scene map servers.");
+                    playerQueue.Add(authModule.GetUserByConnection(netMsg.connectionId));
+                    netMsg.Reply(new MatchMakingResponseMsg()
+                    {
+                        ResponseType = MatchMakingResponseType.NoMatch
+                    });
                 }
             }
         }
@@ -235,15 +375,9 @@ namespace Insight
             //Specify the match details
             RequestSpawnStartMsg requestSpawnStart = new RequestSpawnStartMsg()
             {
-                //Currently sent via request of client during matchmaking, completely optional, could be used for rare case
-                // weirdly it was setup to send requested scene name, but then was hardcoded to always be "SuperAwesomeGame"
-                // args are received in GameRegistration script, add scenes into inspector (verifiedScenes) on GameServer/GameRegistration prefab
-                // (if you want clients to send request scene still)
                 SceneID = sceneID,
-                //This should not be hard coded. Might not be used at all if your GameServer.exe controls scenes.
-                //SceneName = "SuperAwesomeGame",
                 UniqueID = uniqueID,
-                JoinAnyTime = joinAnyTime,
+                //JoinAnyTime = joinAnyTime,
                 GameName = gameName,
                 GameType = gameType,
                 ServerRegion = serverRegion

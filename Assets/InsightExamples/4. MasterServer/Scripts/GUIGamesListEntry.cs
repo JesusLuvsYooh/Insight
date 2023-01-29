@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System.IO;
 
 namespace Insight.Examples
 {
@@ -8,7 +9,10 @@ namespace Insight.Examples
         public PlayerClientGUI clientComp;
 
         public Text SceneNameText;
+        public Text GameTypeText;
+        public Text RegionText;
         public Text PlayerCountText;
+        public Button SelectButton;
 
         public string UniqueID;
         public int SceneID;
@@ -18,6 +22,7 @@ namespace Insight.Examples
         public bool JoinAnyTime;
         public string GameName;
         public int GameType;
+        public int Region;
 
         private bool Init;
 
@@ -27,8 +32,15 @@ namespace Insight.Examples
             {
                 Init = true;
 
-                SceneNameText.text = SceneID.ToString();
+                // SceneNameText.text = SceneID.ToString();
+                //SceneNameText.text = Path.GetFileNameWithoutExtension(clientComp.gameSettingsModule.verifiedScenes[SceneID]);
+                SceneNameText.text = clientComp.gameSettingsModule.verifiedScenes[SceneID];
+                GameTypeText.text = clientComp.gameSettingsModule.verifiedGameTypes[GameType];
+                RegionText.text = clientComp.gameSettingsModule.verifiedServerRegions[Region];
                 PlayerCountText.text = CurrentPlayers + "/" + MaxPlayers;
+
+                if (JoinAnyTime && CurrentPlayers < MaxPlayers)
+                { SelectButton.interactable = true; }
             }
         }
 
