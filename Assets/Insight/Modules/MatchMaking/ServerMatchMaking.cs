@@ -108,6 +108,8 @@ namespace Insight
             }
             else
             {
+                if (InsightServer.instance.NoisyLogs)
+                    Debug.Log("[MatchMaking] - SearchForServers.");
                 SearchForServers(netMsg);
             }
         }
@@ -115,8 +117,8 @@ namespace Insight
         void SearchForServers(InsightNetworkMessage netMsg)
         {
             GameContainer game = null;
-            game = gameManager.registeredGameServers[0];
-            /*
+            //game = gameManager.registeredGameServers[0];
+            
 
             // clear our list, to apply matchmaking options
             filteredGameServers.Clear();
@@ -124,14 +126,18 @@ namespace Insight
 
             sortedGameServers = gameManager.registeredGameServers.OrderBy(value => value.CurrentPlayers).ToList();
 
-            // filter games that do not let players join once started
-            //foreach (GameContainer gameTemp in sortedGameServers)
-            //{
-            //    if (gameTemp.JoinAnyTime == true)
-            //    {
-            //        filteredGameServers.Add(gameTemp);
-            //    }
-            //};
+            if (InsightServer.instance.NoisyLogs)
+                Debug.Log("[MatchMaking] - sortedGameServers count- " + sortedGameServers.Count);
+
+            // filter games that do not let players join once they have started
+            foreach (GameContainer gameTemp in sortedGameServers)
+            {
+                if (gameTemp.JoinAnyTime == true)
+                {
+                    filteredGameServers.Add(gameTemp);
+                }
+            };
+            sortedGameServers = new List<GameContainer>(filteredGameServers);
 
             FilterForServerSpace(netMsg);
 
@@ -154,7 +160,7 @@ namespace Insight
                     ResponseType = MatchMakingResponseType.Join
                 });
             }
-            */
+           
 
 
             if (game != null)
@@ -194,7 +200,7 @@ namespace Insight
             });
         }
 
-            void FilterForServerSpace(InsightNetworkMessage netMsg)
+        void FilterForServerSpace(InsightNetworkMessage netMsg)
         {
             // filter regions if client has a prefered one selected
             if (sortedGameServers != null && sortedGameServers.Count > 0)
@@ -208,8 +214,8 @@ namespace Insight
                     }
                 };
 
-                sortedGameServers = filteredGameServers;
-
+                //sortedGameServers = filteredGameServers;
+                sortedGameServers = new List<GameContainer>(filteredGameServers);
                 if (filteredGameServers == null || filteredGameServers.Count <= 0)
                 {
                     if (InsightServer.instance.NoisyLogs)
@@ -237,8 +243,8 @@ namespace Insight
                     }
                 };
 
-                sortedGameServers = filteredGameServers;
-
+                //sortedGameServers = filteredGameServers;
+                sortedGameServers = new List<GameContainer>(filteredGameServers);
                 if (filteredGameServers == null || filteredGameServers.Count <= 0)
                 {
                     if (InsightServer.instance.NoisyLogs)
@@ -266,8 +272,8 @@ namespace Insight
                     }
                 };
 
-                sortedGameServers = filteredGameServers;
-
+                //sortedGameServers = filteredGameServers;
+                sortedGameServers = new List<GameContainer>(filteredGameServers);
                 if (filteredGameServers == null || filteredGameServers.Count <= 0)
                 {
                     if (InsightServer.instance.NoisyLogs)
@@ -284,7 +290,7 @@ namespace Insight
         void FilterForServerSceneID(InsightNetworkMessage netMsg)
         {
             // filter scene id if client has a prefered one selected
-            if (sortedGameServers != null && sortedGameServers.Count > 0 && sceneID >= 0)
+            if (sortedGameServers != null && sortedGameServers.Count > 0 && sceneID > 0)
             {
                 filteredGameServers.Clear();
                 foreach (GameContainer gameTemp in sortedGameServers)
@@ -295,8 +301,8 @@ namespace Insight
                     }
                 };
 
-                sortedGameServers = filteredGameServers;
-
+                //sortedGameServers = filteredGameServers;
+                sortedGameServers = new List<GameContainer>(filteredGameServers);
                 if (filteredGameServers == null || filteredGameServers.Count <= 0)
                 {
                     if (InsightServer.instance.NoisyLogs)
@@ -501,6 +507,7 @@ namespace Insight
         {
             foreach (UserContainer user in matchUsers)
             {
+                Debug.Log("MovePlayersToServer - ChangeServerMsg");
                 matchModule.server.SendToClient(user.connectionId, new ChangeServerMsg()
                 {
                     NetworkAddress = MatchServer.NetworkAddress,

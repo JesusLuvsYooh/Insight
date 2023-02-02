@@ -137,7 +137,7 @@ namespace Insight
                 int buildIndex = SceneUtility.GetBuildIndexByScenePath(client.gameSettingsModule.verifiedScenes[GameSceneID]);
 
                 // check server has a scene for requested id
-                if (buildIndex >= 0 && client.gameSettingsModule.verifiedScenes.Length >= 0 && args.SceneID < client.gameSettingsModule.verifiedScenes.Length)
+                if (buildIndex >= 0 && client.gameSettingsModule.verifiedScenes.Length > 0 && args.SceneID < client.gameSettingsModule.verifiedScenes.Length)
                 {
 
                     if (InsightClient.instance.NoisyLogs)
