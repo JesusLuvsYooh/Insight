@@ -13,13 +13,15 @@ namespace Insight
         public bool NoisyLogs = true;
         [Tooltip("Auto call login.auth upon clients connecting to MasterServer.")]
         public bool autoAuthClients = false;
-        [Tooltip("This is required for certain features like cross-server chat.\nHowever False will lighten the Master Server load, using fewer resources and allowing more connections.")]
-        public bool PlayerStayConnectedToMasterServer = true;
+        [Tooltip("Keep players connected to Master Server, this is required for certain features like cross-server chat.\nHowever False will lighten the Master Server load, using fewer resources and allowing more connections.")]
+        public bool playerStayConnected = true;
         protected int serverHostId = -1; //-1 = never connected, 0 = disconnected, 1 = connected
         public Dictionary<int, InsightNetworkConnection> connections = new Dictionary<int, InsightNetworkConnection>();
         protected List<SendToAllFinishedCallbackData> sendToAllFinishedCallbacks = new List<SendToAllFinishedCallbackData>();
         public ServerAuthentication serverAuthentication;
         public InsightGameSettings gameSettingsModule;
+        public Transport masterServerTransport;
+        private ushort MasterServerPort = 7000;
 
         public override void Awake()
         {
@@ -38,6 +40,8 @@ namespace Insight
             {
                 instance = this;
             }
+
+            GatherCmdArgs();
         }
 
         public virtual void Start()
@@ -174,7 +178,7 @@ namespace Insight
             
         }
 
-        void HandleDisconnect(int connectionId)
+        public void HandleDisconnect(int connectionId)
         {
             if (NoisyLogs)
                 Debug.Log("[InsightServer] - Client disconnected connectionID: " + connectionId, this);
@@ -268,7 +272,7 @@ namespace Insight
             return false;
         }
 
-        bool RemoveConnection(int connectionId)
+        public bool RemoveConnection(int connectionId)
         {
             return connections.Remove(connectionId);
         }
@@ -408,5 +412,141 @@ namespace Insight
             if (NoisyLogs)
                 Debug.Log("[InsightServer] - Server stopping");
         }
+
+        void GatherCmdArgs()
+        {
+            // check to see if we have args (we should for MasterServer and Spawners)
+            // Please note, Unity editor has its own args upon starting Play Mode.
+#if UNITY_EDITOR
+            if (NoisyLogs)
+                Debug.Log("[ProcessSpawner] Args - No overrides given, using default setup.");
+#else
+            string[] argsCheck = Environment.GetCommandLineArgs();
+            if (argsCheck == null || argsCheck.Length <= 1)
+            {
+                Debug.Log("[ProcessSpawner] Args - No overrides given, using default setup.");
+            }
+            else
+            {
+                InsightArgs args = new InsightArgs();
+                //if (args.IsProvided("-NetworkAddress"))
+                //{
+                //    if (NoisyLogs)
+                //        Debug.Log("[ProcessSpawner] Args - NetworkAddress: " + args.NetworkAddress);
+                //    SpawnerNetworkAddress = args.NetworkAddress;
+                //}
+
+                if (args.IsProvided("-NoisyLogs"))
+                {
+                    if (args.NoisyLogs == "true")
+                    {
+                        NoisyLogs = true;
+                    }
+                    else if (args.NoisyLogs == "false")
+                    {
+                        NoisyLogs = false;
+                    }
+                    if (NoisyLogs)
+                        Debug.Log("[Master InsightServer] Args - NoisyLogs: " + args.NoisyLogs);
+                }
+
+                if (args.IsProvided("-MasterServerPort"))
+                {
+                    if (NoisyLogs)
+                        Debug.Log("[Args] - MasterServerPort: " + args.MasterServerPort);
+                    MasterServerPort = (ushort)args.MasterServerPort;
+
+                    if (masterServerTransport is MultiplexTransport)
+                    {
+                        ushort startPort = MasterServerPort;
+                        foreach (Transport transport in (masterServerTransport as MultiplexTransport).transports)
+                        {
+                            SetPort(transport, startPort++);
+                        }
+                    }
+                    else
+                    {
+                        SetPort(masterServerTransport, MasterServerPort);
+                    }
+                }
+                if (args.IsProvided("-FrameRate"))
+                {
+                    if (NoisyLogs)
+                        Debug.Log("[Master InsightServer] Args - FrameRate: " + args.FrameRate);
+                    Application.targetFrameRate = args.FrameRate;
+                }
+                //if (args.IsProvided("-ProcessName"))
+                //{
+                //    if (NoisyLogs)
+                //        Debug.Log("[ProcessSpawner] Args - ProcessName: " + args.ProcessName);
+                //    ProcessName = args.ProcessName;
+                //}
+                //if (args.IsProvided("-ProcessesMax"))
+                //{
+                //    if (NoisyLogs)
+                //        Debug.Log("[ProcessSpawner] Args - MaximumProcesses: " + args.ProcessesMax);
+                //    MaximumProcesses = args.ProcessesMax;
+                //}
+                //if (args.IsProvided("-ProcessIdleExit"))
+                //{
+                //    if (NoisyLogs)
+                //        Debug.Log("[ProcessSpawner] Args - ProcessIdleExit: " + args.ProcessIdleExit);
+                //    ProcessIdleExit = args.ProcessIdleExit;
+                //}
+                //if (args.IsProvided("-ProcessSpawnerPorts"))
+                //{
+                //    if (NoisyLogs)
+                //        Debug.Log("[ProcessSpawner] Args - ProcessSpawnerPorts: " + args.ProcessSpawnerPorts);
+                //    StartingNetworkPort = args.ProcessSpawnerPorts;
+                //}
+                
+                if (args.IsProvided("-AutoAuthClients"))
+                {
+                    if (NoisyLogs)
+                        Debug.Log("[Master InsightServer] Args - AutoAuthClients: " + args.AutoAuthClients);
+
+                    if (args.AutoAuthClients == "true")
+                    {
+                        autoAuthClients = true;
+                    }
+                    else if (args.AutoAuthClients == "false")
+                    {
+                        autoAuthClients = false;
+                    }
+                }
+                if (args.IsProvided("-PlayerStayConnected"))
+                {
+                    if (NoisyLogs)
+                        Debug.Log("[Master InsightServer] Args - PlayerStayConnected: " + args.PlayerStayConnected);
+
+                    if (args.PlayerStayConnected == "true")
+                    {
+                        playerStayConnected = true;
+                    }
+                    else if (args.PlayerStayConnected == "false")
+                    {
+                        playerStayConnected = false;
+                    }
+                }
+            }
+#endif
+        }
+
+        void SetPort(Transport transport, ushort port)
+        {
+            if (transport.GetType().GetField("port") != null)
+            {
+                transport.GetType().GetField("port").SetValue(transport, port);
+            }
+            else if (transport.GetType().GetField("Port") != null)
+            {
+                transport.GetType().GetField("Port").SetValue(transport, port);
+            }
+            else if (transport.GetType().GetField("CommunicationPort") != null)
+            {//For Ignorance
+                transport.GetType().GetField("CommunicationPort").SetValue(transport, port);
+            }
+        }
     }
 }
+

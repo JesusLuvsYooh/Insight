@@ -243,18 +243,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114111681706678862, guid: e28689e5cfcf647ae9f75ac10bff424d,
         type: 3}
-      propertyPath: NoisyLogs
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114111681706678862, guid: e28689e5cfcf647ae9f75ac10bff424d,
-        type: 3}
-      propertyPath: autoAuthClients
+      propertyPath: playerStayConnected
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114111681706678862, guid: e28689e5cfcf647ae9f75ac10bff424d,
-        type: 3}
-      propertyPath: PlayerStayConnectedToMasterServer
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114810829956139598, guid: e28689e5cfcf647ae9f75ac10bff424d,
         type: 3}
@@ -1094,11 +1084,6 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 114455222607207600, guid: fb641c96eed9f4776bdfaadb82174b97,
-        type: 3}
-      propertyPath: NoisyLogs
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 114473571808863406, guid: fb641c96eed9f4776bdfaadb82174b97,
         type: 3}
       propertyPath: EditorPath
@@ -1113,6 +1098,11 @@ PrefabInstance:
         type: 3}
       propertyPath: MaximumProcesses
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114473571808863406, guid: fb641c96eed9f4776bdfaadb82174b97,
+        type: 3}
+      propertyPath: SpawnerNetworkAddress
+      value: localhost
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fb641c96eed9f4776bdfaadb82174b97, type: 3}
@@ -1321,6 +1311,7 @@ MonoBehaviour:
   masterSpawnerModule: {fileID: 0}
   gameModule: {fileID: 0}
   matchModule: {fileID: 0}
+  gameSettingsModule: {fileID: 0}
   spawnerCountText: {fileID: 2111806610}
   gameCountText: {fileID: 163716046}
   userCountText: {fileID: 1653868710}

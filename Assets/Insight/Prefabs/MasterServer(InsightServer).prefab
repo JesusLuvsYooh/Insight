@@ -237,9 +237,10 @@ MonoBehaviour:
   networkAddress: localhost
   NoisyLogs: 1
   autoAuthClients: 0
-  PlayerStayConnectedToMasterServer: 1
+  playerStayConnected: 1
   serverAuthentication: {fileID: 114818198825535512}
   gameSettingsModule: {fileID: 2206080559440253214}
+  masterServerTransport: {fileID: 6651991178034299723}
 --- !u!114 &114674114120678200
 MonoBehaviour:
   m_ObjectHideFlags: 0

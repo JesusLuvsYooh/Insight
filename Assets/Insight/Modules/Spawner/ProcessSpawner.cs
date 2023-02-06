@@ -38,6 +38,8 @@ namespace Insight
 
         public RunningProcessContainer[] spawnerProcesses;
         private bool AbortRun = false;
+        private int ProcessIdleExit = 0;
+        public Transport masterServerTransport;
 
         public override void Initialize(InsightServer server, ModuleManager manager)
         {
@@ -58,6 +60,8 @@ namespace Insight
         // Switch to Start, so we can  make sure the server or client instance is alive first.
         void Start()
         {
+            GatherCmdArgs();
+
             // all parts of insight use server or client script, so we will grab that data rather than having it duplicated
             if ((InsightServer.instance && InsightServer.instance.NoisyLogs) || (InsightClient.instance && InsightClient.instance.NoisyLogs))
             {
@@ -78,7 +82,7 @@ namespace Insight
             if (NoisyLogs)
                 Debug.Log("[ProcessSpawner] - ProcessPath changed");
             ProcessPath = "";
-        //}
+            //}
 
             if (!ProcessPath.Contains("/Contents/MacOS/"))
             {
@@ -92,7 +96,7 @@ namespace Insight
                 }
             }
 
-            
+
 #endif
 
 #if UNITY_EDITOR
@@ -112,8 +116,6 @@ namespace Insight
                 AbortRun = true;
                 return;
             }
-
-            GatherCmdArgs();
 
             spawnerProcesses = new RunningProcessContainer[MaximumProcesses];
             for (int i = 0; i < spawnerProcesses.Length; i++)
@@ -140,18 +142,63 @@ namespace Insight
             else
             {
                 InsightArgs args = new InsightArgs();
-                if (args.IsProvided("-NetworkAddress"))
+                
+
+                if (args.IsProvided("-MasterServerIP"))
                 {
                     if (NoisyLogs)
-                        Debug.Log("[ProcessSpawner] Args - NetworkAddress: " + args.NetworkAddress);
-                    SpawnerNetworkAddress = args.NetworkAddress;
+                        Debug.Log("[ProcessSpawner] Args - MasterServerIP: " + args.MasterServerIP);
+                    client.networkAddress = args.MasterServerIP;
                 }
-                if (args.IsProvided("-NetworkPort"))
+
+                if (args.IsProvided("-MasterServerPort"))
                 {
                     if (NoisyLogs)
-                        Debug.Log("[ProcessSpawner] Args - NetworkPort: " + args.NetworkPort);
-                    StartingNetworkPort = args.NetworkPort;
+                        Debug.Log("[Args] - MasterServerPort: " + args.MasterServerPort);
+
+                    if (masterServerTransport is MultiplexTransport)
+                    {
+                        ushort startPort = (ushort)args.MasterServerPort;
+                        foreach (Transport transport in (masterServerTransport as MultiplexTransport).transports)
+                        {
+                            SetPort(transport, startPort++);
+                        }
+                    }
+                    else
+                    {
+                        SetPort(masterServerTransport, (ushort)args.MasterServerPort);
+                    }
                 }
+                if (args.IsProvided("-FrameRate"))
+                {
+                    if (NoisyLogs)
+                        Debug.Log("[Master InsightServer] Args - FrameRate: " + args.FrameRate);
+                    Application.targetFrameRate = args.FrameRate;
+                }
+                if (args.IsProvided("-ProcessIdleExit"))
+                {
+                    if (NoisyLogs)
+                        Debug.Log("[ProcessSpawner] Args - ProcessIdleExit: " + args.ProcessIdleExit);
+                    ProcessIdleExit = args.ProcessIdleExit;
+                }
+                if (args.IsProvided("-ProcessSpawnerPort"))
+                {
+                    if (NoisyLogs)
+                        Debug.Log("[ProcessSpawner] Args - ProcessSpawnerPort: " + args.ProcessSpawnerPort);
+                    StartingNetworkPort = args.ProcessSpawnerPort;
+                }
+                //if (args.IsProvided("-ProcessSpawnerIP"))
+                //{
+                //    if (NoisyLogs)
+                //        Debug.Log("[ProcessSpawner] Args - ProcessSpawnerIP: " + args.ProcessSpawnerIP);
+                //    SpawnerNetworkAddress = args.ProcessSpawnerIP;
+                //}
+                //if (args.IsProvided("-ProcessSpawnerPort"))
+                //{
+                //    if (NoisyLogs)
+                //        Debug.Log("[ProcessSpawner] Args - ProcessSpawnerPort: " + args.ProcessSpawnerPort);
+                //    StartingNetworkPort = args.ProcessSpawnerPort;
+                //}
                 if (args.IsProvided("-ProcessName"))
                 {
                     if (NoisyLogs)
@@ -315,7 +362,7 @@ namespace Insight
                     Debug.Log("[ProcessSpawner] - UniqueID was not provided for spawn. Generating: " + spawnProperties.UniqueID);
             }
 
-            
+
             if (string.IsNullOrEmpty(spawnProperties.JoinAnyTime))
             {
                 spawnProperties.JoinAnyTime = "0";
@@ -362,7 +409,9 @@ namespace Insight
                 " -JoinAnyTime " + spawnProperties.JoinAnyTime +
                 " -GameName " + spawnProperties.GameName +
                 " -GameType " + spawnProperties.GameType +
-                " -ServerRegion " + spawnProperties.ServerRegion;
+                " -ServerRegion " + spawnProperties.ServerRegion +
+                " -GameServerIP " + SpawnerNetworkAddress +
+                " -GameServerPort " + (StartingNetworkPort + thisPort * allocatedPorts);
 
             if (System.IO.File.Exists(p.StartInfo.FileName))
             {
@@ -430,6 +479,22 @@ namespace Insight
                 }
             }
             return counter;
+        }
+
+        void SetPort(Transport transport, ushort port)
+        {
+            if (transport.GetType().GetField("port") != null)
+            {
+                transport.GetType().GetField("port").SetValue(transport, port);
+            }
+            else if (transport.GetType().GetField("Port") != null)
+            {
+                transport.GetType().GetField("Port").SetValue(transport, port);
+            }
+            else if (transport.GetType().GetField("CommunicationPort") != null)
+            {//For Ignorance
+                transport.GetType().GetField("CommunicationPort").SetValue(transport, port);
+            }
         }
     }
 

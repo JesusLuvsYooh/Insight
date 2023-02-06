@@ -60,8 +60,8 @@ namespace Insight
     public class RegisterGameMsg : Message
     {
         public string UniqueID; //Guid
-        public string NetworkAddress;
-        public ushort NetworkPort;
+        public string GameServerIP;
+        public ushort GameServerPort;
         public int SceneID;
         public int MaxPlayers;
         public int CurrentPlayers;
@@ -147,8 +147,8 @@ namespace Insight
     public class ChangeServerMsg : Message
     {
         //This is msg would not support all transports in its current configuration.
-        public string NetworkAddress;
-        public ushort NetworkPort;
+        public string GameServerIP;
+        public ushort GameServerPort;
         public int SceneID;
     }
 

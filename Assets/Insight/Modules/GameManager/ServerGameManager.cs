@@ -43,8 +43,8 @@ namespace Insight
 
             registeredGameServers.Add(new GameContainer()
             {
-                NetworkAddress = message.NetworkAddress,
-                NetworkPort = message.NetworkPort,
+                GameServerIP = message.GameServerIP,
+                GameServerPort = message.GameServerPort,
                 UniqueId = message.UniqueID,
                 SceneID = message.SceneID,
                 MaxPlayers = message.MaxPlayers,
@@ -111,8 +111,8 @@ namespace Insight
                 {
                     if (game.JoinAnyTime == false || game.CurrentPlayers >= game.MaxPlayers)
                     {
-                        game.NetworkAddress = "";
-                        game.NetworkPort = 0;
+                        game.GameServerIP = "";
+                        game.GameServerPort = 0;
                     }
                 }
             }
@@ -137,8 +137,8 @@ namespace Insight
             {
                 netMsg.Reply(new ChangeServerMsg()
                 {
-                    NetworkAddress = game.NetworkAddress,
-                    NetworkPort = game.NetworkPort,
+                    GameServerIP = game.GameServerIP,
+                    GameServerPort = game.GameServerPort,
                     SceneID = game.SceneID
                 });
             }
@@ -167,8 +167,8 @@ namespace Insight
     [Serializable]
     public class GameContainer
     {
-        public string NetworkAddress;
-        public ushort NetworkPort;
+        public string GameServerIP;
+        public ushort GameServerPort;
         public string UniqueId;
         public int connectionId;
 

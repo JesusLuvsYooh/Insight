@@ -50,11 +50,10 @@ MonoBehaviour:
   DontDestroy: 1
   AutoStart: 1
   networkAddress: localhost
-  StayConnected: 1
-  AutoReconnect: 1
   AuthClientUponConnect: 0
   NoisyLogs: 1
   clientAuthentication: {fileID: 0}
+  gameSettingsModule: {fileID: 0}
   ReconnectDelayInSeconds: 5
 --- !u!114 &114231125312246618
 MonoBehaviour:
@@ -163,3 +162,4 @@ MonoBehaviour:
   MaximumProcesses: 5
   HealthCheckPollRate: 5
   spawnerProcesses: []
+  masterServerTransport: {fileID: 4417307858792877016}

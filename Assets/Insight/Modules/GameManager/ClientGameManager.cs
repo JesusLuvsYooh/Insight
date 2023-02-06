@@ -40,18 +40,18 @@ namespace Insight
         {
             ChangeServerMsg message = netMsg.ReadMessage<ChangeServerMsg>();
 
-            Debug.Log("[InsightClient] - Connecting to GameServer: " + message.NetworkAddress + ":" + message.NetworkPort + "/" + message.SceneID);
+            Debug.Log("[InsightClient] - Connecting to GameServer: " + message.GameServerIP + ":" + message.GameServerPort + "/" + message.SceneID);
 
             if(networkManagerTransport is MultiplexTransport) {
-                ushort startPort = message.NetworkPort;
+                ushort startPort = message.GameServerPort;
                 foreach(Transport transport in (networkManagerTransport as MultiplexTransport).transports) {
                     SetPort(transport, startPort++);
                 }
             } else {
-                SetPort(networkManagerTransport, message.NetworkPort);
+                SetPort(networkManagerTransport, message.GameServerPort);
             }
 
-            NetworkManager.singleton.networkAddress = message.NetworkAddress;
+            NetworkManager.singleton.networkAddress = message.GameServerIP;
 
             NetworkManager.singleton.StartClient();
             //SceneManager.LoadScene(message.SceneName);
@@ -81,6 +81,8 @@ namespace Insight
 
                 gamesList.Add(new GameContainer()
                 {
+                    //GameServerIP = game.GameServerIP,
+                    //GameServerPort = game.GameServerPort,
                     UniqueId = game.UniqueId,
                     SceneID = game.SceneID,
                     CurrentPlayers = game.CurrentPlayers,

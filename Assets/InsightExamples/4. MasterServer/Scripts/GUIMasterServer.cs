@@ -43,7 +43,6 @@ namespace Insight.Examples
                     masterSpawnerModule = moduleManager.GetModule<MasterSpawner>();
                     gameModule = moduleManager.GetModule<ServerGameManager>();
                     matchModule = moduleManager.GetModule<ServerMatchMaking>();
-                    matchModule = moduleManager.GetModule<ServerMatchMaking>();
                     gameSettingsModule = moduleManager.GetModule<InsightGameSettings>();
                 }
                 return;
@@ -80,8 +79,8 @@ namespace Insight.Examples
             {
                 //activeGamesText.text += game.UniqueId + " - " + game.NetworkAddress + ":" + game.NetworkPort + " - " + game.SceneID + " - " + game.CurrentPlayers + "/" + game.MaxPlayers + " - " + game.GameName + " - " + game.GameType + " - " + game.JoinAnyTime + Environment.NewLine;
                 //currentActiveGamesText += game.NetworkAddress + ":" + game.NetworkPort + " - " + game.SceneID + " - " + game.CurrentPlayers + "/" + game.MaxPlayers + " - " + game.GameName + " - " + game.GameType + " - " + game.JoinAnyTime + Environment.NewLine;
-                activeGamesText.text += game.NetworkAddress + ":" + game.NetworkPort + " - " + gameSettingsModule.verifiedScenes[game.SceneID] + " - " + game.CurrentPlayers + "/" + game.MaxPlayers + " - " + gameSettingsModule.verifiedScenes[game.GameType] + " - " + game.JoinAnyTime + Environment.NewLine;
-                currentActiveGamesText += game.NetworkAddress + ":" + game.NetworkPort + " - " + gameSettingsModule.verifiedScenes[game.SceneID] + " - " + game.CurrentPlayers + "/" + game.MaxPlayers + " - " + gameSettingsModule.verifiedScenes[game.GameType] + " - " + game.JoinAnyTime + Environment.NewLine;
+                activeGamesText.text += game.GameServerIP + ":" + game.GameServerPort + " - " + gameSettingsModule.verifiedScenes[game.SceneID] + " - " + game.CurrentPlayers + "/" + game.MaxPlayers + " - " + gameSettingsModule.verifiedScenes[game.GameType] + " - " + game.JoinAnyTime + Environment.NewLine;
+                currentActiveGamesText += game.GameServerIP + ":" + game.GameServerPort + " - " + gameSettingsModule.verifiedScenes[game.SceneID] + " - " + game.CurrentPlayers + "/" + game.MaxPlayers + " - " + gameSettingsModule.verifiedScenes[game.GameType] + " - " + game.JoinAnyTime + Environment.NewLine;
             }
 
             if (previousActiveGamesText != currentActiveGamesText)

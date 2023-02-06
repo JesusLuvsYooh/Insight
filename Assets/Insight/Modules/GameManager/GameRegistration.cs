@@ -12,8 +12,8 @@ namespace Insight
 
         //Pulled from command line arguments
         public int GameSceneID;
-        public string NetworkAddress;
-        public ushort NetworkPort;
+        public string GameServerIP;
+        public ushort GameServerPort;
         public string UniqueID;
 
         //These should probably be synced from the NetworkManager
@@ -100,24 +100,24 @@ namespace Insight
                 Debug.Log("NULL VS");
 
             InsightArgs args = new InsightArgs();
-            if (args.IsProvided("-NetworkAddress"))
+            if (args.IsProvided("-GameServerIP"))
             {
                 if (InsightClient.instance.NoisyLogs)
-                    Debug.Log("[Args] - NetworkAddress: " + args.NetworkAddress);
-                NetworkAddress = args.NetworkAddress;
+                    Debug.Log("[Args] - GameServerIP: " + args.GameServerIP);
+                GameServerIP = args.GameServerIP;
 
-                NetworkManager.singleton.networkAddress = NetworkAddress;
+                NetworkManager.singleton.networkAddress = GameServerIP;
             }
 
-            if (args.IsProvided("-NetworkPort"))
+            if (args.IsProvided("-GameServerPort"))
             {
                 if (InsightClient.instance.NoisyLogs)
-                    Debug.Log("[Args] - NetworkPort: " + args.NetworkPort);
-                NetworkPort = (ushort)args.NetworkPort;
+                    Debug.Log("[Args] - GameServerPort: " + args.GameServerPort);
+                GameServerPort = (ushort)args.NetworkPort;
 
                 if (networkManagerTransport is MultiplexTransport)
                 {
-                    ushort startPort = NetworkPort;
+                    ushort startPort = GameServerPort;
                     foreach (Transport transport in (networkManagerTransport as MultiplexTransport).transports)
                     {
                         SetPort(transport, startPort++);
@@ -125,7 +125,7 @@ namespace Insight
                 }
                 else
                 {
-                    SetPort(networkManagerTransport, NetworkPort);
+                    SetPort(networkManagerTransport, GameServerPort);
                 }
             }
             
@@ -228,8 +228,8 @@ namespace Insight
                 Debug.Log("[GameRegistration] - registering with master");
             client.Send(new RegisterGameMsg()
             {
-                NetworkAddress = NetworkAddress,
-                NetworkPort = NetworkPort,
+                GameServerIP = GameServerIP,
+                GameServerPort = GameServerPort,
                 UniqueID = UniqueID,
                 SceneID = GameSceneID,
                 MaxPlayers = MaxPlayers,

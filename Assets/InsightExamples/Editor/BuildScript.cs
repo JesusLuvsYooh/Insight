@@ -5,7 +5,7 @@ namespace Insight.Examples
     public class BuildScript
     {
         public static string ScenesRoot = "Assets/InsightExamples/4. MasterServer/Scenes/";
-        public static BuildOptions BuildOptions = BuildOptions.Development;
+        public static BuildOptions BuildOptions = BuildOptions.Development | BuildOptions.EnableHeadlessMode;
         public static string PrevPath = null;
 
         [MenuItem("Build Insight/Build All", false, 0)]

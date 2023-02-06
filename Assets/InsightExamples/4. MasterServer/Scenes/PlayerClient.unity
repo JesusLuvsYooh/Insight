@@ -7487,21 +7487,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 977220133108369793, guid: 936345dc85da8084b8903c7474dc155c,
-        type: 3}
-      propertyPath: AutoReconnect
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 977220133108369793, guid: 936345dc85da8084b8903c7474dc155c,
-        type: 3}
-      propertyPath: StayConnected
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 977220133108369793, guid: 936345dc85da8084b8903c7474dc155c,
-        type: 3}
-      propertyPath: AuthClientUponConnect
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 977220133108369795, guid: 936345dc85da8084b8903c7474dc155c,
         type: 3}
       propertyPath: m_Name

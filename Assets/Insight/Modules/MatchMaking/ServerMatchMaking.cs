@@ -170,12 +170,12 @@ namespace Insight
 
                 netMsg.Reply(new ChangeServerMsg()
                 {
-                    NetworkAddress = game.NetworkAddress,
-                    NetworkPort = game.NetworkPort,
+                    GameServerIP = game.GameServerIP,
+                    GameServerPort = game.GameServerPort,
                     SceneID = game.SceneID
                 });
 
-                if (InsightServer.instance.PlayerStayConnectedToMasterServer == false)
+                if (InsightServer.instance.playerStayConnected == false)
                 {
                     authModule.registeredUsers.Remove(authModule.GetUserByConnection(netMsg.connectionId));
                     NetworkServer.RemoveConnection(netMsg.connectionId);
@@ -396,14 +396,9 @@ namespace Insight
             for (int i = playerQueue.Count - 1; i >= 0; i--)
             {
                 matchUsers.Add(playerQueue[i]);
+                authModule.registeredUsers.Remove(authModule.GetUserByConnection(playerQueue[i].connectionId));
                 playerQueue.RemoveAt(i);
-                if (InsightServer.instance.PlayerStayConnectedToMasterServer == false)
-                {
-                    authModule.registeredUsers.Remove(authModule.GetUserByConnection(playerQueue[i].connectionId));
-                    NetworkServer.RemoveConnection(playerQueue[i].connectionId);
-                }
             }
-
             matchList.Add(new MatchContainer(this, requestSpawnStart, matchUsers));
         }
 
@@ -507,13 +502,26 @@ namespace Insight
         {
             foreach (UserContainer user in matchUsers)
             {
-                Debug.Log("MovePlayersToServer - ChangeServerMsg");
+                if (InsightServer.instance.NoisyLogs)
+                    Debug.Log("MovePlayersToServer - ChangeServerMsg");
                 matchModule.server.SendToClient(user.connectionId, new ChangeServerMsg()
                 {
-                    NetworkAddress = MatchServer.NetworkAddress,
-                    NetworkPort = MatchServer.NetworkPort,
+                    GameServerIP = MatchServer.GameServerIP,
+                    GameServerPort = MatchServer.GameServerPort,
                     SceneID = MatchServer.SceneID
                 });
+
+                if (InsightServer.instance.playerStayConnected == false)
+                {
+                    InsightNetworkConnection conn;
+                    if (InsightServer.instance.connections.TryGetValue(user.connectionId, out conn))
+                    {
+                        if (InsightServer.instance.NoisyLogs)
+                            Debug.Log("MovePlayersToServer - remove users from MS");
+                        conn.Disconnect();
+                        InsightServer.instance.RemoveConnection(user.connectionId);
+                    }
+                }
             }
         }
 
