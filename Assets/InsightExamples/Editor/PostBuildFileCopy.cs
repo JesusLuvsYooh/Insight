@@ -13,10 +13,10 @@ public class PostBuildFileCopy : IPostprocessBuildWithReport
     // use the format of  "folder/file.bat" or "file.bat"
     string[] filePaths = new string[]
     {
-#if UNITY_SERVER
+//#if !UNITY_SERVER
         "InsightExamples/Editor/MasterServerHeadless.bat",
         "InsightExamples/Editor/RemoteSpawnerHeadless.bat"
-#endif
+//#endif
     };
 
     string outputFileName;
@@ -42,7 +42,7 @@ public class PostBuildFileCopy : IPostprocessBuildWithReport
 
         if (report.summary.platform == BuildTarget.StandaloneLinux64)
             outputPath = Path.Combine(outputPath, "_Data");
-
+#if !UNITY_STANDALONE_OSX && !UNITY_EDITOR_OSX
         foreach (string _value in filePaths)
         {
             // Application.dataPath should be Assets folder in Unity Editor
@@ -63,5 +63,6 @@ public class PostBuildFileCopy : IPostprocessBuildWithReport
                 File.Copy(inputPath, outputFileName, true);
             }
         }
+#endif
     }
 }
