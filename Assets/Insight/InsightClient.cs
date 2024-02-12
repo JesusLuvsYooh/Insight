@@ -240,20 +240,14 @@ namespace Insight
             }
         }
 
-#if !MIRROR_71_0_OR_NEWER
-        //void OnClientError(int connectionId, TransportError error, string reason)
-            void OnClientError(TransportError error, string reason)
-#else
-        void OnError(Exception exception)
-#endif
+        //old void OnClientError(int connectionId, TransportError error, string reason)
+        void OnClientError(TransportError error, string reason)
+        //old void OnError(Exception exception)
         {
             // TODO Let's discuss how we will handle errors
-#if !MIRROR_71_0_OR_NEWER
             Debug.LogWarning($"Insight Server Transport Error for {error}: {reason}.");
-           // Debug.LogWarning($"Insight Server Transport Error for connId={connectionId}: {error}: {reason}.");
-#else
-            Debug.LogException(exception);
-#endif
+            // Debug.LogWarning($"Insight Server Transport Error for connId={connectionId}: {error}: {reason}.");
+            //old Debug.LogException(exception);
         }
 
         void OnApplicationQuit()
