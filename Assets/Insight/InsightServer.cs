@@ -51,7 +51,7 @@ namespace Insight
             transport.OnServerConnected=HandleConnect;
             transport.OnServerDisconnected=HandleDisconnect;
             transport.OnServerDataReceived=HandleData;
-            transport.OnServerError=OnError;
+            transport.OnServerError=OnServerError;
 
             if (AutoStart)
             {
@@ -230,18 +230,14 @@ namespace Insight
                 insightNetworkConnection.TransportReceive(data);
             }
         }
-#if MIRROR_71_0_OR_NEWER
-        void OnError(int connectionId, TransportError error, string reason)
-#else
-        void OnError(int connectionId, Exception exception)
-#endif
+
+        //old void OnClientError(int connectionId, TransportError error, string reason)
+        void OnServerError(int connectionId, TransportError error, string reason)
         {
+            //old void OnError(int connectionId, Exception exception)
             // TODO Let's discuss how we will handle errors
-#if MIRROR_71_0_OR_NEWER
             Debug.LogWarning($"Insight Server Transport Error for connId={connectionId}: {error}: {reason}.");
-#else
-            Debug.LogException(exception);
-#endif
+            //old Debug.LogException(exception);
         }
 
         public string GetConnectionInfo(int connectionId)

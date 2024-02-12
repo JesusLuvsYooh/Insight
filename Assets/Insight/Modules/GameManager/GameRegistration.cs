@@ -36,12 +36,9 @@ namespace Insight
             //NetworkManager.singleton.OnServerDisconnect = OnServerDisconnect;
             //NetworkManager.singleton.OnServerAddPlayer = OnServerAddPlayer;
 
-#if MIRROR_71_0_OR_NEWER
              networkManagerTransport = Transport.active;
-#else
-            networkManagerTransport = Transport.activeTransport;
+            //old networkManagerTransport = Transport.activeTransport;
 
-#endif
             // use Game Settings master bool, can be overrided by args
             JoinAnyTime = client.gameSettingsModule.JoinAnyTime;
             //networkManagerTransport.OnServerDisconnected = OnServerDisconnect;
