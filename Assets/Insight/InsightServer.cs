@@ -48,7 +48,8 @@ namespace Insight
         {
             Application.runInBackground = true;
 
-            transport.OnServerConnected=HandleConnect;
+            transport.OnServerConnectedWithAddress = HandleConnect;
+            //transport.OnServerConnected=HandleConnect; older mirror
             transport.OnServerDisconnected=HandleDisconnect;
             transport.OnServerDataReceived=HandleData;
             transport.OnServerError=OnServerError;
@@ -95,9 +96,9 @@ namespace Insight
             OnStopInsight();
         }
 
-        
 
-        void HandleConnect(int _connectionId)
+        //void HandleConnect(int _connectionId) older mirror
+        void HandleConnect(int _connectionId, string clientAddress)
         {
                 //Debug.LogWarning("connectionId: " + connectionId);
             //if (serverID == 0)

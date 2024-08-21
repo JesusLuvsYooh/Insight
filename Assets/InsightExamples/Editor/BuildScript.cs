@@ -7,10 +7,28 @@ namespace Insight.Examples
         public static string ScenesRoot = "Assets/InsightExamples/4. MasterServer/Scenes/";
         public static BuildOptions BuildOptions = BuildOptions.Development | BuildOptions.EnableHeadlessMode;
         public static string PrevPath = null;
+        public static string extension = ".exe";
+        public static bool individualFolders = true;
 
-        [MenuItem("Build Insight/Build All", false, 0)]
+        [MenuItem("Build Insight/Build All Win", false, 0)]
         public static void BuildAllMenu()
         {
+            string path = GetPath();
+            if (!string.IsNullOrEmpty(path))
+            {
+                BuildMasterServer(path);
+                BuildRemoteSpawner(path);
+                BuildGameServer(path);
+                BuildPlayerClient(path);
+            }
+        }
+        [MenuItem("Build Insight/Build All Mac", false, 0)]
+        public static void BuildAllMenuMac()
+        {
+#if UNITY_STANDALONE_OSX
+            extension = ".app";
+            BuildOptions = BuildOptions.Development;
+#endif
             string path = GetPath();
             if (!string.IsNullOrEmpty(path))
             {
@@ -68,7 +86,11 @@ namespace Insight.Examples
         ScenesRoot+"MasterServer.unity"
         };
             PlayerSettings.productName = "MasterServer";
-            BuildPipeline.BuildPlayer(scenes, path + "/MasterServer.exe", GetBuildTarget(), BuildOptions);
+            if (individualFolders)
+            {
+                path += "/" + PlayerSettings.productName;
+            }
+            BuildPipeline.BuildPlayer(scenes, path + "/MasterServer" + extension, GetBuildTarget(), BuildOptions);
         }
 
         public static void BuildRemoteSpawner(string path)
@@ -78,7 +100,11 @@ namespace Insight.Examples
         ScenesRoot+"RemoteSpawner.unity"
         };
             PlayerSettings.productName = "RemoteSpawner";
-            BuildPipeline.BuildPlayer(gameServerScenes, path + "/RemoteSpawner.exe", GetBuildTarget(), BuildOptions);
+            if (individualFolders)
+            {
+                path += "/" + PlayerSettings.productName;
+            }
+            BuildPipeline.BuildPlayer(gameServerScenes, path + "/RemoteSpawner" + extension, GetBuildTarget(), BuildOptions);
         }
 
         public static void BuildGameServer(string path)
@@ -91,7 +117,11 @@ namespace Insight.Examples
         ScenesRoot+"GreatGoodMap.unity"
         };
             PlayerSettings.productName = "GameServer";
-            BuildPipeline.BuildPlayer(gameServerScenes, path + "/GameServer.exe", GetBuildTarget(), BuildOptions);
+            if (individualFolders)
+            {
+                path += "/"+ PlayerSettings.productName;
+            }
+            BuildPipeline.BuildPlayer(gameServerScenes, path + "/GameServer" + extension, GetBuildTarget(), BuildOptions);
         }
 
         public static void BuildPlayerClient(string path)
@@ -104,7 +134,11 @@ namespace Insight.Examples
         ScenesRoot+"GreatGoodMap.unity"
         };
             PlayerSettings.productName = "PlayerClient";
-            BuildPipeline.BuildPlayer(scenes, path + "/PlayerClient.exe", GetBuildTarget(), BuildOptions);
+            if (individualFolders)
+            {
+                path += "/" + PlayerSettings.productName;
+            }
+            BuildPipeline.BuildPlayer(scenes, path + "/PlayerClient" + extension, GetBuildTarget(), BuildOptions);
         }
 
         #region Helpers
